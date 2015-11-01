@@ -1,4 +1,19 @@
 # CSS Styleguide
+## はじめに
+このスタイルガイドはCSSを扱う上でベターだと思われる方法をまとめたものです。必ずしも正しいものかは分かりません。このスタイルガイドの目的は共通の認識や知識を得ることにあります。
+
+このスタイルガイドは以下の3つのドキュメントに大きく影響を受けています。
+
+* [CSS Guidelines (2.2.4) – High-level advice and guidelines for writing sane, manageable, scalable CSS](http://cssguidelin.es/)
+* [Sass Guidelines](http://sass-guidelin.es/)
+* [hiloki/flocss](https://github.com/hiloki/flocss)
+
+### 基本的な考え方
+* 「KISSの原則」（不必要な複雑さを避け、簡潔に単純にすること）を第一に考えること
+* 「DRYの原則」（繰り返しや重複を避けること）を第二に考えること
+* 知識の差をなるべく埋め、認識のズレを少なくすること
+* 共通のルールを決めて周知し、遵守すること
+* いつ見ても、誰が読んでも理解できるように一貫性を保つこと
 
 ## ファイル構成
 CSSには詳細度があります。同じ詳細度であれば、あとで記述したスタイルが適応されますが、詳細度の強さが違う場合は必ずしも適応されるわけではありません。理想的にいえばスタイルシートの序盤は詳細度が弱く抽象的で一般的なスタイルを持ち、終盤になるにしたがって詳細度が強く具体的なスタイルが指定されるべきです。
@@ -30,7 +45,6 @@ Sassのパーシャルを使用するとファイルを一旦分割して管理�
 @import "layout/_header";
 @import "layout/_main";
 @import "layout/_sidebar";
-
 
 /* ==========================================================================
    Object
@@ -93,11 +107,19 @@ Sassを使用している場合は以下のルールを追加します。
     margin-left: auto;
     padding-right: $padding;
     padding-left: $padding;
+    @media (min-width: 1000px) {
+        padding-right: ($padding * 2);
+        padding-left: ($padding * 2);
+    }
 }
 
 /* NG */
 .foo,
 .foo--bar, .baz{
+  @media (min-width: 1000px){
+    padding-right: ($padding * 2);
+    padding-left: ($padding * 2);
+  }
   display: block;margin-right: auto;
   margin-left:auto;
   @extend %base-unit;
@@ -121,6 +143,69 @@ Sassを使用している場合は以下のルールを追加します。
 .u-por { position: relative !important; }
 .u-poa { position: absolute !important; }
 .u-pof { position: fixed !important; }
+```
+
+### プロパティの宣言順
+ルールセット内の宣言は重要なプロパティから書き始め、その機能ごとに固めて記述することで意図を素早く理解できるようにしましょう。プロパティの宣言順は以下のようなルールで記述するのを推奨します。
+
+1. ボックスモデルの種類や表示方法を示すプロパティ（`display`, `box-sizeing`, `float`, `visibility` など）
+1. 位置情報に関するプロパティ（`position`, `z-index`など）
+1. ボックスモデルのサイズに関するプロパティ（`width`, `height`, `margin`, `padding`, `border`など）
+1. フォント関連のプロパティ（`font-size`, `line-height`など）
+1. 色に関するプロパティ（`color`, `background-color`など）
+1. それ以外
+
+アルファベット順で記述することは禁止します。整列ではなく、理解しやすいように分類することが目的だからです。
+
+```css
+/* OK */
+.foo {
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 0.75em;
+    color: #000;
+    background-color: #fff;
+}
+
+/* NG */
+.foo {
+    background-color: #fff;
+    bottom: 0;
+    color: #000;
+    display: block;
+    font-size: 0.75em;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+}
+```
+
+### 個別指定プロパティの宣言順
+例えば`margin`プロパティは`margin-top`や`margin-left`、`position`プロパティは`top`や`left`のように個別に方向を指定することもできます。このような個別に方向を指定できるプロパティは規則性を持たせるため、時計回りに指定するのを推奨します。
+
+```css
+/* OK */
+.foo {
+    margin-top: auto;
+    margin-right: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+}
+
+/* NG */
+.foo {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+}
 ```
 
 ## コメント
@@ -363,7 +448,7 @@ BEMはBlock, Element, Modifierの3つから構成され、以下のようなclas
 ```
 
 ### BEMの注意点
-ElementのElementを表すためにElementを連結させてはいけません。`sub`や`child`といった名前によって関係性を表しましょう。
+ElementのElementを表すためにElementを連結させてはいけません。HTMLの構造を示すのではなく、Blockに対するElementとModifierの関係性を示すようにしましょう。例えば`sub`や`child`といった名前によって関係性を表しましょう。
 
 ```css
 /* OK */
@@ -416,7 +501,7 @@ Sassを使用している場合、ネストによってBEMの記述が楽にな�
 classに`-sm`や`-md`などを付与してブレイクポイントを指定していることを示すことがあります。より明示的に名前をつけるために`@`を接尾辞として使用することを推奨します。
 
 ```css
-// OK
+/* OK */
 .u-col1of3\@md { width: width: 33.33333% !important; }
 .u-col2of3\@md { width: width: 66.66667% !important; }
 .u-col3of3\@md { width: width: 100% !important; }
@@ -430,7 +515,7 @@ classに`-sm`や`-md`などを付与してブレイクポイントを指定し�
 意味が汲み取れない単語の省略は禁止します。例えば`navigation`を`nav`と省略することは許容しますが、`title`を`ttl`と省略するのは意味が読み取れませんし、ほとんど短くなってもいません。基本的には省略をせずに名前を付け、省略する場合にはドキュメントに残すことを推奨します。
 
 ### 汎用的な名前をつける
-`.mb10`のような値を固定した名前をつけることを禁止します。`.mb10`は`margin-bottom:10px;`が指定されていると判断できますが、値を変更する場合にHTMLに記述したclass属性も変更する必要が出てきます。こうした変更に柔軟に対応するために`.mbs`のような相対的な名前をつけましょう。
+`.mb10`のような値を固定した名前をつけることを禁止します。`.mb10`は`margin-bottom:10px;`が指定されていると判断することができるので理解しやすさには優れていますが、値を変更する場合にHTMLに記述したclass属性も変更する必要が出てきます。こうした変更に柔軟に対応するために`.mbs`のような相対的な名前をつけましょう。
 
 ```css /* OK */
 /* sはsmallの意味 */
