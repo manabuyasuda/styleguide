@@ -73,7 +73,7 @@ CSSの構文はセレクタとブレース、プロパティと値からなっ�
 * 各ルールセットの間に空行を1つ
 
 ```css
-/* OK */
+/* Good */
 .foo, .foo--bar,
 .baz {
     display: block;
@@ -81,7 +81,7 @@ CSSの構文はセレクタとブレース、プロパティと値からなっ�
     margin-left: auto;
 }
 
-/* NG */
+/* Bad */
 .foo,
 .foo--bar, .baz{
   display: block;margin-right: auto;
@@ -96,7 +96,7 @@ Sassを使用している場合は以下のルールを追加します。
 * @contentを使用している@mixinは最後に指定します
 
 ```scss
-/* OK */
+/* Good */
 .foo, .foo--bar,
 .baz {
     $padding: 1em;
@@ -113,7 +113,7 @@ Sassを使用している場合は以下のルールを追加します。
     }
 }
 
-/* NG */
+/* Bad */
 .foo,
 .foo--bar, .baz{
   @media (min-width: 1000px){
@@ -139,6 +139,7 @@ Sassを使用している場合は以下のルールを追加します。
 * 各ルールセットの間には空行を入れない
 
 ```css
+/* Good */
 .u-pos { position: static !important; }
 .u-por { position: relative !important; }
 .u-poa { position: absolute !important; }
@@ -158,7 +159,7 @@ Sassを使用している場合は以下のルールを追加します。
 アルファベット順で記述することは禁止します。整列ではなく、理解しやすいように分類することが目的だからです。
 
 ```css
-/* OK */
+/* Good */
 .foo {
     display: block;
     position: absolute;
@@ -172,7 +173,7 @@ Sassを使用している場合は以下のルールを追加します。
     background-color: #fff;
 }
 
-/* NG */
+/* Bad */
 .foo {
     background-color: #fff;
     bottom: 0;
@@ -191,7 +192,7 @@ Sassを使用している場合は以下のルールを追加します。
 例えば`margin`プロパティは`margin-top`や`margin-left`、`position`プロパティは`top`や`left`のように個別に方向を指定することもできます。このような個別に方向を指定できるプロパティは規則性を持たせるため、時計回りに指定するのを推奨します。
 
 ```css
-/* OK */
+/* Good */
 .foo {
     margin-top: auto;
     margin-right: auto;
@@ -199,7 +200,7 @@ Sassを使用している場合は以下のルールを追加します。
     margin-left: auto;
 }
 
-/* NG */
+/* Bad */
 .foo {
     margin-left: auto;
     margin-right: auto;
@@ -294,7 +295,6 @@ Sassを使用する場合は以下のようにコメントをします。
 @import "layout/_header";
 @import "layout/_main";
 // @import "layout/_sidebar";
-
 
 /* ==========================================================================
    Object
@@ -451,11 +451,11 @@ BEMはBlock, Element, Modifierの3つから構成され、以下のようなclas
 ElementのElementを表すためにElementを連結させてはいけません。HTMLの構造を示すのではなく、Blockに対するElementとModifierの関係性を示すようにしましょう。例えば`sub`や`child`といった名前によって関係性を表しましょう。
 
 ```css
-/* OK */
+/* Good */
 .block__element {}
 .block__sub-element {}
 
-/* NG */
+/* Bad */
 .block__element {}
 .block__element__element {}
 ```
@@ -463,7 +463,7 @@ ElementのElementを表すためにElementを連結させてはいけません�
 Sassを使用している場合、ネストによってBEMの記述が楽になりますが、使用を禁止します。理由はBlockに関連するルールセットが際限なくつながり、長くなることで可読性やメンテナンス性を損なう可能性が高いからです。
 
 ```scss
-// NG
+// Bad
 .block {
     &__element {
         ...
@@ -488,6 +488,7 @@ Sassを使用している場合、ネストによってBEMの記述が楽にな�
 }
 ```
 
+
 ### 接頭辞（Prefix）
 接頭辞（Prefix）をclassセレクタとIDセレクタに使用することで、名前が重複する可能性を下げたり、その役割を簡潔に示すことができます。FLOCSSで定義されている接頭辞に以下のような接頭辞を加えて使用するのを推奨します。
 
@@ -501,10 +502,12 @@ Sassを使用している場合、ネストによってBEMの記述が楽にな�
 classに`-sm`や`-md`などを付与してブレイクポイントを指定していることを示すことがあります。より明示的に名前をつけるために`@`を接尾辞として使用することを推奨します。
 
 ```css
-/* OK */
-.u-col1of3\@md { width: width: 33.33333% !important; }
-.u-col2of3\@md { width: width: 66.66667% !important; }
-.u-col3of3\@md { width: width: 100% !important; }
+/* Good */
+@media (min-width: 768px) {
+    .u-col1of3\@md { width: width: 33.33333% !important; }
+    .u-col2of3\@md { width: width: 66.66667% !important; }
+    .u-col3of3\@md { width: width: 100% !important; }
+}
 ```
 
 スタイルシートで指定する際にはバックスラッシュ（`\`）でのエスケープが必要ですが、HTMLで指定する際にはエスケープは必要ありません。詳しくは以下の記事を参照してください。
@@ -518,10 +521,10 @@ classに`-sm`や`-md`などを付与してブレイクポイントを指定し�
 `.mb10`のような値を固定した名前をつけることを禁止します。`.mb10`は`margin-bottom:10px;`が指定されていると判断することができるので理解しやすさには優れていますが、値を変更する場合にHTMLに記述したclass属性も変更する必要が出てきます。こうした変更に柔軟に対応するために`.mbs`（smallの意味）のような相対的な名前をつけましょう。
 
 ```css
-/* OK */
+/* Good */
 .mbs { margin-bottom: 10px; }
 
-/* NG */
+/* Bad */
 .mb10 { margin-bottom: 10px; }
 ```
 
@@ -532,6 +535,7 @@ classに`-sm`や`-md`などを付与してブレイクポイントを指定し�
 HTMLの`style`属性に直接スタイルを記述するインライン記述は使用を禁止します。理由はスタイルシートで一括管理できないこと、詳細度が高いこと、HTMLのファイルサイズを無闇に増やしてしまうこと、単一のスタイルごとしか指定できない（レスポンシブに対応できない）からです。
 
 ```html
+<!-- Bad -->
 <div style="color:red; background-color: black;"></div>
 ```
 
@@ -541,6 +545,7 @@ JavaScriptによるインラインでのスタイル追加もできるだけ避�
 マークアップは変更される場合があります。例えば`article`を`section`にしたり`h2`を`h3`に変更するかもしれません。特定のHTML要素に依存したセレクタを指定している場合はその都度変更しなくてはいけません。
 
 ```css
+/* Bad */
 article h2 {}
 ```
 
@@ -558,17 +563,17 @@ article h2 {}
 classやIDセレクタで指定する時に要素セレクタを連結させるのは詳細度を高めるだけで意味がありません。
 
 ```css
-/* OK */
+/* Good */
 .foo {}
 
-/* NG */
+/* Bad */
 h2.foo {}
 ```
 
 もし、特定の要素に指定してほしいのであれば、コメントによってそれを示しましょう。
 
 ```css
-/* OK */
+/* Good */
 /* h2要素に指定してください。 */
 .foo {}
 
@@ -579,10 +584,10 @@ h2.foo {}
 セレクタは必ずしもHTML構造に沿う必要はありません。場合によってはセレクタを短くすることで詳細度を低く抑えることができます。
 
 ```css
-/* OK */
+/* Good */
 ul a {}
 
-/* NG */
+/* Bad */
 ul li a {}
 ```
 
@@ -590,11 +595,11 @@ ul li a {}
 特定の意味を持たないセレクタ（`div`, `span`）は使用される範囲も広いため、セレクタに対する影響範囲も広くなります。使用する場合はできるだけ範囲を狭くして指定してください。また、単体でのセレクタは禁止とします。
 
 ```css
-/* OK */
+/* Good */
 .foo > div {}
 .foo > span {}
 
-/* NG */
+/* Bad */
 div {}
 span {}
 .foo div {}
@@ -611,7 +616,7 @@ CSSのIDセレクタとHTMLのid属性とは区別して考えます。
 `!important`は基本的に使用を禁止しますが、意図を持って能動的に使用する場合は許容されます。例えばグリッドレイアウトなどに使用される`width`のヘルパークラスです。
 
 ```css
-/* OK */
+/* Good */
 .u-col1of12 { width: 8.33333% !important; }
 .u-col2of12 { width: 16.66667% !important; }
 .u-col3of12 { width: 25% !important; }
@@ -620,9 +625,10 @@ CSSのIDセレクタとHTMLのid属性とは区別して考えます。
 その場合もスタイルシートの終盤に記述をして、影響範囲を抑えましょう。
 
 ### スタイルを取り消している
-スタイルの取り消しとは、あるスタイルを`0`や`none`などで値をリセットすることです。スタイルの取り消しがあった場合は多くのスタイルを持ちすぎている、スタイルを早く指定していまっていることが考えられます（リセットCSSは除く）。
+スタイルの取り消しとは、あるスタイルを`0`や`none`などで値をリセットすることです。スタイルの取り消しがあった場合は多くのスタイルを持ちすぎている、スタイルを早く指定してしまっていることが考えられます（リセットCSSは除く）。
 
 ```css
+/* Bad */
 .foo {
     border: 1px solid #ddd;
 }
@@ -636,6 +642,7 @@ CSSのIDセレクタとHTMLのid属性とは区別して考えます。
 Modifierで定義しておくと必要な時にだけ指定することができます。
 
 ```css
+/* Good */
 .foo {}
 .foo--bordered {
     border: 1px solid #ddd;
@@ -646,7 +653,7 @@ Modifierで定義しておくと必要な時にだけ指定することができ
 `h1`は`p`といったセマンティックな要素セレクタには装飾的なスタイルを指定してはいけません。必ずあとでスタイルを取り消すことになります。
 
 ```css
-/* NG */
+/* Bad */
 h2 {
     padding-bottom: 0.5em;
     border-bottom: 1px solid #888;
@@ -656,7 +663,7 @@ h2 {
 要素セレクタにはブラウザのデフォルトスタイルシートやリセットCSSで指定されるような最低限のスタイルにとどめておきましょう。
 
 ```css
-/* OK */
+/* Good */
 h2 {
     font-size: 2rem;
     line-height: 1.2;
@@ -670,6 +677,7 @@ h2 {
 閲覧されるデバイスによって同じコンテンツであっても横幅が変わるため高さも可変します。高さを指定しているとコンテンツが隠れてしまったり、余分な余白ができてしまいます。
 
 ```css
+/* Bad */
 .foo {
     height: 1000px;
 }
@@ -681,17 +689,17 @@ h2 {
 コンポーネントは基本的に固有の幅を持つことを禁止します。`width`を指定していると、ある場所では幅が足りず、ある場所でははみ出てしまうなどの弊害が出ます。幅を指定したい時は、コンテナコンポーネントに`max-width`を指定する、`width`のヘルパークラスを使用する、Modifierでサイズを指定するなどの方法があります。
 
 ```css
-/* OK */
+/* Good */
 .c-button {}
 
 .c-wrapper {
     max-width: 1200px;
 }
-c-button--size-full {
+.c-button--size-full {
     width: 100%;
 }
 
-/* NG */
+/* Bad */
 .c-button {
     width: 300px;
 }
@@ -701,10 +709,10 @@ c-button--size-full {
 `color`プロパティなどで色を指定する時は可読性をあげるために、可能な場合は短縮しましょう。
 
 ```css
-/* OK */
+/* Good */
 .foo  { color: #ddd; }
 
-/* NG */
+/* Bad */
 .foo  { color: #dddddd; }
 ```
 
@@ -712,14 +720,14 @@ c-button--size-full {
 `content`プロパティやURLの指定、属性セレクタの指定をする時にはダブルクウォートを使用しましょう。
 
 ```css
-/* OK */
+/* Good */
 .foo {
     content: "this is content";
     background: url("logo.png");
 }
 input[type="submit"] {}
 
-/* NG */
+/* Bad */
 .foo {
     content: 'this is content';
     background: url(logo.png);
@@ -732,10 +740,10 @@ input[type='submit'] {}
 値が0の場合はpxや%といった単位は必要がないため使用しません。
 
 ```css
-/* OK */
+/* Good */
 .foo { margin: 0; }
 
-/* NG */
+/* Bad */
 .foo { margin: 0px; }
 ```
 
@@ -743,10 +751,10 @@ input[type='submit'] {}
 `0.5em`などの小数点の前の0は省略しません。ファイルサイズの削減は考えずに、明示的に指定しましょう。
 
 ```css
-/* OK */
+/* Good */
 .foo { font-size: 0.5em; }
 
-/* NG */
+/* Bad */
 .foo { font-size: .5em; }
 ```
 
@@ -754,10 +762,10 @@ input[type='submit'] {}
 プロパティとプロパティ値は大文字でも小文字でも同様に扱われますが、小文字に統一しましょう。
 
 ```css
-/* OK */
+/* Good */
 .foo { color: #fff;
 
-/* NG */
+/* Bad */
 .foo  { COLOR: #FFF;
 ```
 
@@ -765,14 +773,14 @@ input[type='submit'] {}
 `font-size`や`margin`などショートハンドが用意されているプロパティがありますが、ショートハンドに指定しなかったプロパティに初期値が渡されてしまうことから意図せずプロパティがリセットされてしまう可能性があります。また、指定する必要がないところにまで指定する必要が出てきます。明示的に何が目的なのかを示すという意味でも使用をなるべく避けましょう。
 
 ```css
-/* OK */
+/* Good */
 .foo { 
     /* 中央配置にする。 */
     margin-right: auto;
     margin-left: auto;
 }
 
-/* NG */
+/* Bad */
 /* 上下を0に指定する必要がない。 */
 .foo { margin: 0 auto; }
 ```
@@ -801,7 +809,7 @@ SassにはCSSとしてアウトプットさせないファイルを定義する�
 Sassの変数は特定の値を一括で管理できる便利な機能ですが、使いすぎると可読性を損なったり変数名がバッティングする危険性が増します。同じ値を繰り返し指定する場合や四則演算などで値を変更・再計算する場合にだけ定義しましょう。
 
 ```scss
-// OK
+// Good
 $unit-base: 1em !dafault;
 .foo {
     margin-left: (-$unit-base);
@@ -810,7 +818,7 @@ $unit-base: 1em !dafault;
     padding-left: $unit-base;
 }
 
-// NG
+// Bad
 $foo-unit: 1em !dafault;;
 .foo {
     padding: $foo-unit;
@@ -821,6 +829,7 @@ $foo-unit: 1em !dafault;;
 モジュール内で、ある変数や値が繰り返し使用されている場合はモジュール専用の変数を定義しましょう。プロジェクト全体で使用される変数に変更があった場合でも各モジュールで対応できるようにしておきます。
 
 ```scss
+// Good
 $unit-base: 1em !default;
 
 /**
@@ -833,10 +842,10 @@ $media-gutter: $unit-base !default;
 変数を定義する際には`!default`フラグを必ず指定するようにしましょう。その変数が定義されているファイルより先に同じ変数を定義し直すことで変数の値を確実に上書きすることができます。これによって変数をまとめて管理することが可能になります（必ずしもまとめて変更する必要はなく、あくまでオプションです）。
 
 ```scss
-// OK
+// Good
 $unit-base: 1em !default;
 
-// NG
+// Bad
 $unit-base: 1em;
 ```
 
@@ -844,7 +853,7 @@ $unit-base: 1em;
 兄弟セレクタやBEMのElementやModifierを指定するためにSassのネストは便利です。ですが、ネストを制限なく使用すると際限なく縦に長くなってしまい、可読性を損ないます。ネストは擬似要素、擬似クラス、メディアクエリの使用にとどめます。
 
 ```scss
-// OK
+// Good
 .foo {
     &:hover,
     &:focus {
@@ -855,7 +864,7 @@ $unit-base: 1em;
     }
 }
 
-// NG
+// Bad
 .foo {
     &__bar {
         ...
@@ -873,7 +882,7 @@ $unit-base: 1em;
 ネストするセレクタが明確に関係している場合はネストの使用を許容します。別々のルールセットにして記述するよりも理解しやすいと考えられるためです。
 
 ```scss
-// OK
+// Good
 .foo--gutter-medium {
     margin-left: - $foo-gutter;
     > .foo__item {
@@ -886,12 +895,12 @@ $unit-base: 1em;
 Sassでは四則演算を使うことができます。複数の数値を計算させる時に想定外の計算結果になってしまうことを防ぐために括弧`（）`で囲いましょう。
 
 ```scss
-// OK
+// Good
 .foo {
     width: (100% / 3);
 }
 
-// NG
+// Bad
 .foo {
     width: 100% / 3;
 }
