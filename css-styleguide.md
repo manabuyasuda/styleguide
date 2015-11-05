@@ -868,6 +868,21 @@ $unit-base: 1em !default;
 $unit-base: 1em;
 ```
 
+### 変数や関数に名前空間をつける
+BootstrapやBourbonといったフレームワークやライブラリを併用した時に変数や関数の名前の衝突が起きないように、名前空間（namespace）をつけましょう。多少冗長にはなってしまいますが、確実に指定することができるようになります。
+
+```scss
+// Good
+$my-variable: "variable";
+@funciton my-function() {}
+@mixin my-mixin() {}
+
+// Bad
+$variable: "variable";
+@funciton function() {}
+@mixin mixin() {}
+```
+
 ### ネストは擬似要素やメディアクエリだけに制限する
 兄弟セレクタやBEMのElementやModifierを指定するためにSassのネストは便利です。ですが、ネストを制限なく使用すると際限なく縦に長くなってしまい、可読性を損ないます。ネストは擬似要素、擬似クラス、メディアクエリの使用にとどめます。
 
