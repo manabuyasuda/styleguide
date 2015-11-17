@@ -738,10 +738,10 @@ h2 {
 
 ```css
 /* Good */
-.foo  { color: #ddd; }
+.foo { color: #ddd; }
 
 /* Bad */
-.foo  { color: #dddddd; }
+.foo { color: #dddddd; }
 ```
 
 ### 文字列には引用符（ダブルクォート）をつける
@@ -794,7 +794,7 @@ input[type='submit'] {}
 .foo { color: #fff; }
 
 /* Bad */
-.foo  { COLOR: #FFF; }
+.foo { COLOR: #FFF; }
 ```
 
 ### ショートハンドはなるべく避ける
