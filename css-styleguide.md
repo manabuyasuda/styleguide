@@ -442,6 +442,7 @@ BEMはBlock, Element, Modifierの3つから構成され、以下のようなclas
 よって以下のように短く書くこともできます。
 
 ```css
+/* Good */
 .block-name {}
 .block-name__element {}
 .block-name--modifier {}
@@ -461,7 +462,7 @@ ElementのElementを表すためにElementを連結させてはいけません�
 .block__element__element {}
 ```
 
-OOCSSはマルチクラスでBEMはシングルクラスだ、などと言われることがありますが、そういったことはありません。[Yandex](https://www.yandex.com/)のソースコードを見てもマルチクラスで指定されています。例えば同じHTML要素に異なるBlockやElementを指定したとしても妥当な指定方法です。
+OOCSSはマルチクラスでBEMはシングルクラスだ、などと言われることがありますが、そういったことはありません。[Yandex](https://www.yandex.com/)のソースコードを見てもマルチクラスで指定されています。例えば同じHTML要素に異なるBlockやElementを指定したとしても妥当な指定方法です(OOCSSの構造と見た目を別々に指定したい時など)。
 
 ```html
 <!-- Good -->
