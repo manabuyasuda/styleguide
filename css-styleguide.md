@@ -460,6 +460,15 @@ ElementのElementを表すためにElementを連結させてはいけません�
 .block__element__element {}
 ```
 
+OOCSSはマルチクラスでBEMはシングルクラスだ、などと言われることがありますが、そういったことはありません。[Yandex](https://www.yandex.com/)のソースコードを見てもマルチクラスで指定されています。例えば同じHTML要素に異なるBlockやElementを指定したとしても妥当な指定方法です。
+
+```html
+<!-- Good -->
+<div class="block1 block2">
+  <div class="block1__element block2__element">
+</div>
+```
+
 Sassを使用している場合、ネストによってBEMの記述が楽になりますが、使用を禁止します。理由はBlockに関連するルールセットが際限なくつながり、長くなることで可読性やメンテナンス性を損なう可能性が高いからです。
 
 ```scss
