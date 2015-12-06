@@ -628,11 +628,11 @@ h2.foo {}
 ```css
 /* Good */
 ul a {}
-table th {}
+th {}
 
 /* Bad */
 ul li a {}
-th {}
+table th {}
 ```
 
 ### セマンティックでないセレクタの指定を制限する
