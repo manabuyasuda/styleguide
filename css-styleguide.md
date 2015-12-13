@@ -108,7 +108,7 @@ Sassを使用している場合は以下のルールを追加します。
     margin-left: auto;
     padding-right: $padding;
     padding-left: $padding;
-    @media (min-width: 1000px) {
+    @include media-query(md) {
         padding-right: ($padding * 2);
         padding-left: ($padding * 2);
     }
@@ -117,7 +117,7 @@ Sassを使用している場合は以下のルールを追加します。
 /* Bad */
 .foo,
 .foo--bar, .baz{
-  @media (min-width: 1000px){
+  @include media-query(md) {
     padding-right: ($padding * 2);
     padding-left: ($padding * 2);
   }
