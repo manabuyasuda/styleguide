@@ -650,6 +650,68 @@ span {}
 .foo span {}
 ```
 
+### 拡張できるようにオブジェクトを定義する
+保守性や拡張性を高めるために構造を含んだベースになるclassを定義し、装飾的なclassで拡張するようにしましょう。ベースになるスタイルを変更したい場合でも1箇所変更するだけでよくなりますし、拡張するclassにも最低限のスタイルを追加するだけになります。
+
+1つのclassでまとめて指定してしまうと、バリエーションが増えるごとに同じスタイルを何回も指定することになってしまいます。ベースになるスタイルを変更したい場合に何箇所も変更する必要も出てきます。
+
+下記の例ではベースになるclassの`.p-alert`に装飾的なスタイルが指定されていますが、オブジェクトの特性上、問題はごくわずかだと判断しています。
+
+```html
+<!-- Good -->
+<p class="p-alert"></p>
+<p class="p-alert p-alert--success"></p>
+<p class="p-alert p-alert--error"></p>
+```
+
+```css
+/* Good */
+.p-alert {
+    padding: 1em;
+    border: 1px solid #e7edf0;
+    border-radius: 3px;
+    color: #47525d;
+    background-color: #f7f9fa;
+}
+
+.p-alert--success {
+    border-color: #d9f4e1;
+    color: #2c683f;
+    background-color: #edfaf1;
+}
+
+.p-alert--error {
+    border-color: #ffcaca;
+    color: #921515;
+    background-color: #ffe3e3;
+}
+
+/* Bad */
+.p-alert-default {
+    padding: 1em;
+    border: 1px solid #e7edf0;
+    border-radius: 3px;
+    color: #47525d;
+    background-color: #f7f9fa;
+}
+
+.p-alert-success {
+    padding: 1em;
+    border: 1px solid #d9f4e1;
+    border-radius: 3px;
+    color: #2c683f;
+    background-color: #edfaf1;
+}
+
+.p-alert-error {
+    padding: 1em;
+    border: 1px solid #ffcaca;
+    border-radius: 3px;
+    color: #921515;
+    background-color: #ffe3e3;
+}
+```
+
 ### IDセレクタを多用しない
 CSSはカスケーディングをコントロールしなければ、すぐに破綻してしまいます。IDセレクタは詳細度が圧倒的に高いことや、ページ内に1度しか使用できないため再利用性にも欠けます。classではなくIDで指定する理由が説明できる場合にのみ使用しましょう。
 
