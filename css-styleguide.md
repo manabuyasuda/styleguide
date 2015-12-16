@@ -454,6 +454,8 @@ BEMはBlock, Element, Modifierの3つから構成され、以下のようなclas
 ```
 
 ### BEMの注意点
+
+#### Elementの連結をさせない
 ElementのElementを表すためにElementを連結させてはいけません。HTMLの構造を示すのではなく、Blockに対するElementとModifierの関係性を示すようにしましょう。例えば`sub`や`child`といった名前によって関係性を表しましょう。
 
 ```css
@@ -466,6 +468,7 @@ ElementのElementを表すためにElementを連結させてはいけません�
 .block__element__element {}
 ```
 
+#### マルチクラスを禁止にしない
 OOCSSはマルチクラスでBEMはシングルクラスだ、などと言われることがありますが、そういったことはありません。[Yandex](https://www.yandex.com/)のソースコードを見てもマルチクラスで指定されています。例えば同じHTML要素に異なるBlockやElementを指定したとしても妥当な指定方法です(OOCSSの構造と見た目を別々に指定したい時など)。
 
 ```html
@@ -475,6 +478,42 @@ OOCSSはマルチクラスでBEMはシングルクラスだ、などと言われ
 </div>
 ```
 
+#### Blockを親セレクタにしない
+
+詳細度を強くしたり、スコープを作るためにBlockを親セレクタにしてElementとModifierを指定しないようにしましょう。Blockの名前を継承することで擬似的にスコープを作るようにしましょう。詳細度はなるべくフラットに保ってカスケーディングのコントロールをしやすいようにします。
+
+```css
+/* Good */
+.block {}
+.block__element {}
+.block--modifier {}
+
+/* Bad */
+.block {}
+.block .block__element {}
+.block .block--modifier {}
+```
+
+#### 他のBlockに依存させない
+Blockは他のBlockに依存せず、単独で機能するようにしましょう。例えば、`Block1`のスタイルを変更するために`Block2`を親セレクタにして`Block1`を上書きすることはできるだけ避けましょう。同じ詳細度であれば、セレクタを加えなくても後から記述するだけで適応されます。
+
+```css
+/* Good */
+.block1 {}
+.block__element {}
+
+.block2 {}
+
+/* Bad */
+.block1 {}
+.block__element {}
+
+.block2 .block1 {}
+```
+
+また、例えば`Block1`と`Block2`を左右に配置したい場合は、グリッドのようにレイアウトをするための`Block3`を定義するようにしましょう。Blockの機能を拡張しすぎたり、依存関係を作ってしまうよりも、Blockを組み合わせることでページを構築するようにします。
+
+#### Sassのネストを制限する
 Sassを使用している場合、ネストによってBEMの記述が楽になりますが、なるべく使用しないようにしましょう。理由はBlockに関連するルールセットが際限なくつながり、長くなることで可読性やメンテナンス性を損なう可能性が高いからです。
 
 ```scss
@@ -501,20 +540,6 @@ Sassを使用している場合、ネストによってBEMの記述が楽にな�
         }
     }
 }
-```
-
-詳細度を強くしたり、スコープを作るためにBlockを親セレクタにしてElementとModifierを指定しないようにしましょう。Blockの名前を継承することで擬似的にスコープを作るようにしましょう。詳細度はなるべくフラットに保ってカスケーディングのコントロールをしやすいようにします。
-
-```css
-/* Good */
-.block {}
-.block__element {}
-.block--modifier {}
-
-/* Bad */
-.block {}
-.block .block__element {}
-.block .block--modifier {}
 ```
 
 ### 接頭辞（Prefix）
