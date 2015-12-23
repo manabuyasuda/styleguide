@@ -33,6 +33,41 @@ CSSには詳細度という仕組みがあります。詳細度が同じであ�
 1. Project - プロジェクト固有のビジュアルパターンでいわゆるUI（ユーザーインターフェイス）が該当します。ほとんどのスタイルの追加はこのレイヤーになります。
 1. Utility - いわゆる汎用クラスのことで、主に単一のスタイルを持っています。ComponentとProjectレイヤーで指定するのが適切でない例外的なスタイルや汎用的に使えるスタイルが定義されています。オプションとして`!important`を許容しています。
 
+#### レイヤーを追加する
+FLOCSSにないレイヤーを追加することもできます。ただし、詳細度の管理に支障が出ないように追加する場所には注意しましょう。例えば以下のようなレイヤーが考えられます。
+
+* Variable - プロジェクトでグローバルに使用される変数を定義します。
+* Function - プロジェクトでグローバルに使用されるfunctionを定義します。
+* Mixin - プロジェクトでグローバルに使用されるmixinを定義します。
+* Vendors - Normalize.cssやBootstrapのような外部のライブラリやCSSフレームワークです。
+* Vendors-extension - Vendorsレイヤーを上書きするためのレイヤーです。
+* Theme - SMACSSのThemeモジュールに該当します。defaultテーマやdarkテーマのようなページ全体のカラーを変更する場合に使用します。多言語化対応のためのスタイル変更なども該当するでしょう。
+* Scope - 例えばブログの投稿用のスタイルを要素セレクタに指定したい場合などに使用します。class属性を指定する必要がないため、コーディングができないひとでも簡単に投稿することができるようになります。
+* QA/Test - Quality Assurance（品質保証）、もしくはテストのための一時的なスタイルを定義するレイヤーです。
+
+追加するレイヤーについては以下の記事を参考にします。
+
+* [More Transparent UI Code with Namespaces – CSS Wizardry](http://csswizardry.com/2015/03/more-transparent-ui-code-with-namespaces/)
+* [Managing CSS Projects with ITCSS](http://csswizardry.net/talks/2014/11/itcss-dafed.pdf)
+
+追加するレイヤーは以下のように追加します。（Vendorsなどの）レイヤーによっては子レイヤーではなく、親レイヤーとしてもいいでしょう。
+
+* Foundation
+ * Variable
+ * Function
+ * Mixin
+ * Vendors
+ * Vendors-extension
+ * Base
+* Layout
+* Object
+ * Component
+ * Project
+ * Theme
+ * Scope
+ * QA/Test
+ * Utility
+
 FLOCSS以外では[ITCSS](https://speakerdeck.com/dafed/managing-css-projects-with-itcss)と[SMACSS](https://smacss.com/ja)が候補としてあげられます。
 
 ### Sassのパーシャル機能で@importする
@@ -550,6 +585,9 @@ Sassを使用している場合、ネストによってBEMの記述が楽にな�
 * `u-` Utilityレイヤーのオブジェクトであることを示します
 * `js-` JavaScriptのフックとして使用されるclassやIDであることを示します（CSSでスタイルは指定しない）
 * `is-`, `has-` 要素の表示の切り替えなどの状態の変化があることを示します
+* `t-` Themeレイヤーのオブジェクトであることを示します。
+* `s-` Scopeレイヤーのオブジェクトであることを示します。
+* `qa-`, `t-` QA/Testレイヤーのオブジェクトであることを示します。
 
 ### 接尾辞（Suffix）
 classに`-sm`や`-md`などを付与してブレイクポイントを指定していることを示すことがあります。より明示的に名前をつけるために`@`を接尾辞として使用することを推奨します。
