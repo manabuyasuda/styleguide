@@ -108,6 +108,7 @@ CSSの構文はセレクタとブレース、プロパティと値からなっ�
 * コロン（`:`）と値の間にスペースを1つ
 * クロージングブレースは独立した行に
 * 各ルールセットの間に空行を1つ
+* 関数はカンマ（`,`）と引数の間にスペースを1つ
 
 ```css
 /* Good */
@@ -116,13 +117,15 @@ CSSの構文はセレクタとブレース、プロパティと値からなっ�
     display: block;
     margin-right: auto;
     margin-left: auto;
+    rgba(0, 0, 100, 0.8);
 }
 
 /* Bad */
 .foo,
 .foo--bar, .baz{
   display: block;margin-right: auto;
-  margin-left:auto;}
+  margin-left:auto;
+  rgba(0,0,100,0.8);}
 ```
 
 ### Sass使用時の追加ルール
