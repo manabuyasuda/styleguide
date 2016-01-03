@@ -132,7 +132,7 @@ CSSの構文はセレクタとブレース、プロパティと値からなっ�
     display: block;
     margin-right: auto;
     margin-left: auto;
-    rgba(0, 0, 100, 0.8);
+    background-color: rgba(0, 0, 100, 0.8);
 }
 
 /* Bad */
@@ -140,7 +140,7 @@ CSSの構文はセレクタとブレース、プロパティと値からなっ�
 .foo--bar, .baz{
   display: block;margin-right: auto;
   margin-left:auto;
-  rgba(0,0,100,0.8);}
+  background-color: rgba(0,0,100,0.8);}
 ```
 
 ### Sass使用時の追加ルール
