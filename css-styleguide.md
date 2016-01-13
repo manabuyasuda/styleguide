@@ -1071,6 +1071,11 @@ $unit-base: 1em !default;
 $media-gutter: $unit-base !default;
 ```
 
+### 変数だけでなくキーワードや相対値を利用する
+数値やカラーは必ずしも変数で固定値を指定する必要はありません。例えば親要素の計算値を継承する[inherit](https://developer.mozilla.org/ja/docs/Web/CSS/inherit)キーワードやプロパティの初期値を指定する[initial](https://developer.mozilla.org/ja/docs/Web/CSS/initial)キーワード、同じ要素の`color`プロパティを取り込む[currentColor](http://www.hcn.zaq.ne.jp/___/WEB/css-color-ja.html#currentcolor-color)キーワードなどがあります。
+
+数値（[length](https://developer.mozilla.org/ja/docs/Web/CSS/Length)）を指定するときも`px`のような絶対値で指定するよりも、当該要素のフォントサイズを基準にする`em`やルート要素（通常は`html`要素）のフォントサイズを基準にする`rem`のような相対値で指定したほうが柔軟に対応することができます。
+
 ### 変数には!defaultフラグを必ず指定する
 変数を定義する際には`!default`フラグを必ず指定するようにしましょう。その変数が定義されているファイルより先に同じ変数を定義し直すことで変数の値を確実に上書きすることができます。これによって変数をまとめて管理することが可能になります（必ずしもまとめて変更する必要はなく、あくまでオプションです）。
 
