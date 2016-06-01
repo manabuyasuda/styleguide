@@ -735,18 +735,20 @@ span {}
 #### 擬似クラスを活用する
 CSS3の擬似クラスを使うとセレクタを柔軟に指定することができます。
 
-* 最初の要素 - `:first-of-type`
-* 最後の要素 - `:last-of-type`
 * x番目の要素 - `:nth-of-type(x)`
+* x番目以降の要素 - `nth-of-type(n+x)`
 * 奇数の要素 - `:nth-of-type(odd)` `nth-of-type(2n+1)`
 * 偶数の要素 - `:nth-of-type(even)` `:nth-of-type(2n)`
-* 最初のx番目の要素 - `:nth-of-type(-n+x)`
-* 最初の要素以外 - `:not(:first-of-type)` `:nth-of-type(n+2)`
-* 最初から数えてx番目の要素 - `:nth-last-of-type(x)`
+* 最初の要素 - `:first-of-type`
+* 最初の要素以外の要素 - `:not(:first-of-type)` `:nth-of-type(n+2)`
+* 最初から数えてx番目までの要素 - `:nth-of-type(-n+x)`
+* 最後の要素 - `:last-of-type`
+* 最後の要素以外 - `:not(:last-of-type)`
+* 最後から数えてx番目の要素 - `:nth-last-of-type(x)`
 * 最後の要素でなおかつ奇数の要素 - `:nth-of-type(odd):last-of-type`
 * 最初の子要素 - `> :first-child`
 * 最後の子要素 - `> :last-child`
-* あるクラス名で始まる要素のx番目 - `> [class^="section__item"]:nth-child(x)`
+* あるクラス名がfooで始まる要素のx番目 - `> [class^="foo"]:nth-child(x)`
 
 CSS3の擬似クラスを使う場合は`nth-child`のような`-child`ではなく、`nth-of-type`のような`of-type`を使います。`-child`は親要素から見た子要素を要素のタイプに関係なく数えるので、HTMLの構造によっては期待どおりにならないことがあります。
 
@@ -755,10 +757,16 @@ CSS3の擬似クラスを使う場合は`nth-child`のような`-child`ではな
 
 セレクタの工夫で詳細度を変える方法もあります。
 
-* `.foo`の詳細度を強くする場合は`.foo.foo`
-* `#bar`の詳細度を弱くする場合は`[id="bar"]`
+* `.foo`(0,0,1,0)の詳細度を強くする場合は`.foo.foo`(0,0,2,0)
+* `#bar`(0,1,0,0)の詳細度を弱くする場合は`[id="bar"]`(0,0,1,0)
+* `html`(0,0,0,1)の詳細度を強くする場合は`:root`(0,0,1,0)
+* `a`(0,0,0,1)の詳細度を強くする場合は`a:link`(0,0,1,1)
 
-ちなみに`.foo`と`[class="foo"]`は同じ詳細度（0, 0, 1, 0）になります。
+`.foo`と`[class="foo"]`は同じ詳細度（0, 0, 1, 0）になりますが、属性セレクタは「`.foo`で始まるクラス名」のような柔軟な指定ができます。
+
+* `[class^="foo"]` class属性の値がfooで始まる（前方一致）要素
+* `[class$="foo"]` class属性の値がfooで終わる（後方一致）要素
+* `[class*="foo"]` class属性の値がfooを含む（部分一致）要素
 
 [Specificity Calculator](http://specificity.keegan.st/)
 
