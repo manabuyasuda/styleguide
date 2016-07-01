@@ -6,7 +6,7 @@ CSSプリプロセッサーにはSassのscss記法を使います。CSSをその
 詳細度の強さやスコープの範囲を管理するために[FLOCSS](https://github.com/hiloki/flocss)をベースにしたファイル構成にします。
 
 ```
-.
+root
 ├── assets
 │   ├── css
 │   │   ├── foundation
