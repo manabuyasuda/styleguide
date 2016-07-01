@@ -5,6 +5,60 @@ CSSプリプロセッサーにはSassのscss記法を使います。CSSをその
 ## ファイル構成
 詳細度の強さやスコープの範囲を管理するために[FLOCSS](https://github.com/hiloki/flocss)をベースにしたファイル構成にします。
 
+```
+.
+├── assets
+│   ├── css
+│   │   ├── foundation
+│   │   │   ├── base
+│   │   │   ├── function
+│   │   │   ├── mixin
+│   │   │   ├── variable
+│   │   │   └── vendor
+│   │   ├── layout
+│   │   ├── object
+│   │   │   ├── component
+│   │   │   ├── project
+│   │   │   └── utility
+│   │   └── style.scss
+│   ├── image
+│   └── js
+├── common
+│   ├── css
+│   │   └── common.scss
+│   ├── image
+│   └── js
+├── css
+│   └── single.scss
+├── image
+│   ├── content
+│   ├── info
+│   └── intro
+├── index.html
+├── js
+└── page1
+    ├── common
+    │   ├── css
+    │   │   └── common.scss
+    │   ├── image
+    │   └── js
+    ├── css
+    │   └── single.scss
+    ├── image
+    │   ├── content
+    │   ├── info
+    │   └── intro
+    ├── index.html
+    ├── js
+    └── page1-1
+```
+
+* assets/cssにはサイト共通のスタイルを置きます。
+* common/css/common.scssにはディレクトリ共通のスタイルを置きます。
+* css/single.scssにはページ専用のスタイルを置きます。
+
+CSSは1つのファイルにまとめようとせず、組み合わせて使うようにします。ファイルを分割することで読み込み順を管理しやすくなり、カスケーディングやクラス名をシンプルにすることができます。
+
 ### FLOCSS
 
 FLOCSSはFoundation、Layout、Objectの3つのレイヤーとComponent、Project、Utilityの3つの子レイヤーから構成されます。
@@ -15,10 +69,6 @@ FLOCSSはFoundation、Layout、Objectの3つのレイヤーとComponent、Projec
 1. Component - 多くのプロジェクトで横断的に再利用できるような小さな単位のモジュールが該当します。OOCSSの構造の機能を担い、固有のサイズや装飾的なスタイルを極力含まないようにします。
 1. Project - プロジェクト固有のスタイルが該当します。プロジェクトで使い回すスタイルのほとんどはProjectレイヤーに追加することになります。
 1. Utility - いわゆる汎用クラスのことで、ほとんどの場合で単一のスタイルを持っています。確実にスタイルを適応させるために`!important`を指定します。
-
-あるページでしか使わないようなユニークなスタイルは、共通化させずにそのページにだけ読み込ませるようにします。共通のCSSファイルより後に読み込むことで、優先的に適応されるようにします。
-
-ファイル構成としては、FLOCSSで構成されたCSSファイルをルートディレクトリに置き、ページ専用のCSSファイルは必要なディレクトリに置きます。
 
 ### レイヤーの追加
 FLOCSSのファイル構成案にはレイヤーを追加することもできます。
@@ -190,7 +240,7 @@ Elementを入れ子にするときに`.block__element__element`のような名�
 ```scss
 // Good
 .block__element {}
-.block__sub-element {}
+.block__child-element {}
 
 // Bad
 .block__element {}
@@ -241,26 +291,13 @@ Sassの入れ子とアンパサンド（`&`）でBEMの記述を短縮するこ�
 
 ```scss
 // Bad
-.block {
-  &__element {
-    ...
+.foo {
+  color: white;
+  &--bar {
+    color: red;
   }
-  &__element {
-    ...
-  }
-  &__element {
-    ...
-  }
-  &--modifier {
-    ...
-  }
-  &__element {
-    ...
-  }
-  &__element {
-    &--modifier {
-      ...
-    }
+  & .bar {
+    color: red;
   }
 }
 ```
@@ -271,25 +308,15 @@ Sassの入れ子とアンパサンド（`&`）でBEMの記述を短縮するこ�
 
 ```scss
 // Good
-.block__element:hover {}
-.block__element.is-active {}
-
-.block__element {
-  @media (min-width: 768px) {
-
-  }
-}
-
-// Bad
 .block {
-  &__element {
-
-    &:hover {
-
-    }
-    &.is-active {
-
-    }
+  &:hover {
+    color: blue;
+  }
+  &.is-active {
+    color: blue;
+  }
+  @include _mq-up(md) {
+    color: green;
   }
 }
 ```
@@ -967,6 +994,8 @@ input[type='submit'] {}
 // Bad
 .foo { margin: 0px; }
 ```
+
+ただし、角度（`deg`,`grad`,`rad`,`turn`）や時間（`s`,`ms`）では単位の省略をすることができないので注意します。
 
 #### 小数点のあたまの0を省略しない
 0.5emなどの小数点の前の0は省略しません。ファイルサイズの削減は考えずに、明示的に指定します。
