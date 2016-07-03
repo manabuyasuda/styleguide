@@ -606,15 +606,16 @@ CSSの構文はセレクタとブレース、プロパティと値で構成さ�
 * 色に関するプロパティ（`color`, `background-color`など）
 * それ以外
 
-アルファベット順には記述しません。整列ではなく、理解しやすいように分類することが目的だからです。
+アルファベット順には記述しません。プロパティをアルファベット順で書いていくのは難しいと思いますし、読み難いとも思います。例えば`position`プロパティ
+で位置の指定をする場合に`top`と`left`が離れてしまうのは読みやすいでしょうか？
 
 ```scss
 // Good
 .foo {
   display: block;
-  position: absolute;
-  right: 0;
-  bottom: 0;
+  position: absolute; // 親要素に対して、
+  top: 0;
+  left: 0; // 左上を基準にする。
   width: 100%;
   margin: 0;
   padding: 0;
@@ -626,14 +627,14 @@ CSSの構文はセレクタとブレース、プロパティと値で構成さ�
 // Bad
 .foo {
   background-color: #fff;
-  bottom: 0;
   color: #000;
   display: block;
   font-size: 0.75em;
+  left: 0; // どこかにpositionがある？
   margin: 0;
   padding: 0;
-  position: absolute;
-  right: 0;
+  position: absolute; // positionがあった、親要素を基準にするのか
+  top: 0; // 上にあわせて、他の値はなんだっただろう？
   width: 100%;
 }
 ```
