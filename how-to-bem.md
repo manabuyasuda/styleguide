@@ -18,7 +18,8 @@ MindBEMdingは[csswizardryことHarry Roberts](https://github.com/csswizardry)�
 BEMに関しては、公式ドキュメントを翻訳した[bem-methodology-ja](https://github.com/juno/bem-methodology-ja/blob/master/definitions.md)が公開されています。
 
 ## BEMの概念
-BEMはブロック（Block）、エレメント（Element）、モディファイア（Modifier）の頭文字をとったものです。詳しい説明は後述します。
+BEMはブロック（Block）、エレメント（Element）、モディファイア（Modifier）の頭文字をとったものです。  
+Blockはあるパーツ（コンポーネント）の親要素です。このBlockの中にはElementと呼ばれる子孫要素があります。Modifierはバリエーションを変えるときに指定するもので、BlockかElementと同階層に指定します。詳しい説明は後述します。
 
 命名規則はハイフン2つやアンダースコア2つでつなげます。
 
@@ -26,7 +27,6 @@ BEMはブロック（Block）、エレメント（Element）、モディファ�
 * `.Block__Element`
 * `.Block--Modifier`
 * `.Block__Element--Modifier`
-
 
 ### Block（親要素）
 Blockはサイトを構成するパーツのことです。例えばボタン、グリッド、タブ、画像などで、簡単に言ってしまえばパーツの親要素です。BEMではBlockを起点として考え、サイトはBlockを組み合わせることで構成していきます。
@@ -40,7 +40,7 @@ Blockはサイトを構成するパーツのことです。例えばボタン、
 }
 ```
 
-ボタンはBlockとして考えることができます。
+ボタンもBlockとして考えることができます。
 
 ```scss
 .button {
@@ -86,7 +86,7 @@ BEMではBlock（親要素）から見て下の階層にいる要素はすべて
 
 クラス名は`.block__element`のようにBlockの名前を引き継いでアンダースコア2つでつなぎます。
 
-例えばグリッドレイアウトであればこのようになります。`.grid`がBlockになり、`.grid__item`がElementになります。
+例えばグリッドレイアウトであれば、`.grid`がBlockになり、`.grid__item`がElementになります。
 
 ```scss
 .grid {
@@ -106,10 +106,10 @@ BEMではBlock（親要素）から見て下の階層にいる要素はすべて
 }
 ```
 
-ボタンを`box`というBlockのElementとして定義してみました。Block特有のスタイルがある場合はBlockの中で意義した方がいいかもしれません。
+ボタンを`box`というBlockのElementとして定義してみました。Block特有のスタイルがある場合はBlockの中で意義します。
 
 ```html
-/* OK */
+<!-- OK -->
 <div class="box">
   <a href="#" class="box__button"></a>
 </div>
@@ -119,7 +119,7 @@ BEMではBlock（親要素）から見て下の階層にいる要素はすべて
 
 
 ```html
-/* Good */
+<!-- Good -->
 <div class="box">
   <a href="#" class="button"></a>
 </div>
@@ -187,7 +187,7 @@ BEMのクラス名はBlockの名前を引き継いだりハイフン2つやア�
 
 なのでBEMを使う場合には命名規則を案件ごとに変えることがよくあります。
 
-例えば通常は`block-name`のように単語をハイフンで区切ります。
+例えば、通常は`block-name`のように単語をハイフンで区切ります。
 
 ```scss
 .block-name {}
@@ -253,6 +253,7 @@ IDセレクタを使わないのはページ内で使い回せるようにする
 BEMでは必然的にElementの数が多くなります。Blockから見て孫要素ができることもあります。このときに`.block__element__element`のようなクラス名にしているケースがあります。
 
 ```html
+<!-- NG -->
 <div class="box">
   <div class="box__element">
     <div class="box__element__element">
@@ -263,6 +264,7 @@ BEMでは必然的にElementの数が多くなります。Blockから見て孫�
 BEMはHTMLの構造をElementによって表す必要はありません。`child-element`のような名前にしても伝わります。
 
 ```html
+<!-- Good -->
 <div class="box">
   <div class="box__element">
     <div class="box__child-element">
@@ -277,6 +279,7 @@ BEMはHTMLの構造をElementによって表す必要はありません。`child
 
 
 ```html
+<!-- Good -->
 <ul class="nav">
   <li class="nav__items">
     <ul class="nav__child-items">
@@ -298,6 +301,7 @@ BEMはHTMLの構造をElementによって表す必要はありません。`child
 極端な例かもしれませんが、これを`element__element`のように親要素の名前を引き継いだ場合はかなり冗長になってしまいます。
 
 ```html
+<!-- NG -->
 <ul class="nav">
   <li class="nav__item">
     <ul class="nav__item__items">
@@ -345,6 +349,7 @@ BEMはHTMLの構造をElementによって表す必要はありません。`child
 例えばElementの`padding`を変更するModifierを作りたい場合、すべてのElementにModifierを指定するのは冗長で指定忘れが出てしまったりするかもしれません。
 
 ```html
+<!-- NG -->
 <div class="box">
   <div class="box__element box__element--size-large"></div>
   <div class="box__element box__element--size-large"></div>
@@ -366,6 +371,7 @@ BEMはHTMLの構造をElementによって表す必要はありません。`child
 このパターンにはBlock--Modiferを起点にしてスタイルを指定する方が運用しやすくなります。
 
 ```html
+<!-- Good -->
 <div class="box box--size-large">
   <div class="box__element"></div>
   <div class="box__element"></div>
@@ -430,7 +436,17 @@ Sassでは入れ子と`&`を使ってBEMを早く書くことができますが�
 
 
 ## ElementとModifierはBlockのスコープに入れない
-BEMのルールではElementとModifierはBlockのなかでだけ存在することができるとあります。厳密にする場合はセレクタの結合子にBlockをを常に指定することもできます。
+BEMのルールではElementとModifierはBlockのなかでだけ存在することができるとあります。以下のHTMLはBlockが存在しないためルール違反になります。
+
+```html
+<!-- NG -->
+<div class="box--size-large">
+  <div class="box__element"></div>
+  <div class="box__element"></div>
+</div>
+```
+
+厳密にする場合はセレクタの結合子にBlockを常に指定します。
 
 ```scss
 .block {}
@@ -438,13 +454,14 @@ BEMのルールではElementとModifierはBlockのなかでだけ存在するこ
 .block.block--modifier {}
 ```
 
-Blockを名前空間のようにすることで、以下のようにBlockを指定しないマークアップを防ぐことができます。
+Blockを名前空間にすることで、Blockを指定しないマークアップを防ぐことができます。
 
 ```html
+<!-- Blockがないので、スタイルは適応されない。 -->
 <div class="box--size-large">
   <div class="box__element"></div>
   <div class="box__element"></div>
 </div>
 ```
 
-ただし、個人的にはここまで厳密にする必要はないんじゃないかと考えています。セレクタを複雑にして厳密さを求めるより、BEMの基本的なルールを守ってもらえるようにコミュニケーションをとる方が必要ではないかなと考えています。
+ただし、個人的にはここまで厳密にする必要はありません。セレクタを複雑にして厳密さを求めるより、BEMの基本的なルールを守ってもらえるようにコミュニケーションをとる方が必要ではないかなと考えています。
