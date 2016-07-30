@@ -19,6 +19,52 @@ root
 │   │   ├── object
 │   │   │   ├── component
 │   │   │   ├── project
+│   │   │   ├── scope
+│   │   │   └── utility
+│   │   └── style.scss
+│   ├── image
+│   └── js
+├── common
+│   ├── image
+├── image
+│   ├── content
+│   ├── info
+│   └── intro
+├── index.html
+└── page1
+    ├── common
+    │   └── image
+    ├── image
+    │   ├── content
+    │   ├── info
+    │   └── intro
+    ├── index.html
+    └── page1-1
+```
+
+assets/cssにはサイトで指定するスタイルをすべて置きます。object/scopeレイヤーにページ固有のスタイルを指定します。assets/cssディレクトリ以外にはCSSファイルは存在しません。
+
+もし、以下のような特徴のあるサイトの場合はディレクトリごとやファイルごとにCSSファイルを置くことを検討します。
+
+* 静的サイトで運用をしていく
+* ページごとに大きくデザインが変わることが多い
+* 運用フェーズではSassを使わない 
+
+```
+root
+├── assets
+│   ├── css
+│   │   ├── foundation
+│   │   │   ├── base
+│   │   │   ├── function
+│   │   │   ├── mixin
+│   │   │   ├── variable
+│   │   │   └── vendor
+│   │   ├── layout
+│   │   ├── object
+│   │   │   ├── component
+│   │   │   ├── project
+│   │   │   ├── scope
 │   │   │   └── utility
 │   │   └── style.scss
 │   ├── image
@@ -79,7 +125,7 @@ FLOCSSのファイル構成案にはレイヤーを追加することもでき�
 * Vendor - Normalize.cssやBootstrapのような外部のライブラリやフレームワーク
 * Vendor-extension - Vendorレイヤーの上書き（オーバーライド）
 * Theme - SMACSSのThemeモジュールに該当するテーマによる色の切り替えなど
-* Scope - ブログの投稿用スタイルなどのスコープを作る
+* Scope - コンポーネント単位ではなく、ページ単位でスタイルを調整したいときなど
 * QA/Test - Quality Assurance（品質保証）、もしくはテストのための一次的なスタイル
 
 レイヤーの追加は以下のリンクを参考にします。
@@ -323,6 +369,8 @@ Sassの入れ子とアンパサンド（`&`）でBEMの記述を短縮するこ�
 
 早く書けることも必要ですが、修正や運用がしやすいことのほうがずっと重要です。
 
+その他のBEMに関する注意点などは[BEM(MindBEMding)によるCSS設計](https://github.com/manabuyasuda/styleguide/blob/master/how-to-bem.md)を参照してください。
+
 ## コメント
 コメントにはコードを理解しやすくするような補足情報を書きます。例えば、全体像を把握するための目次や区切りを分かりやすくする見出し、コード自体の補足、なぜそうしたのか、今後どう変えていきたいのかといった情報です。
 
@@ -333,7 +381,10 @@ Sassの入れ子とアンパサンド（`&`）でBEMの記述を短縮するこ�
 /**
  * FUNCTION
  * strip-unit...pxやremなどの単位を取り除きます。
- * color...明度を基準に色を変更します。
+ * em...pxをemに変換します。
+ * rem...pxをremに変換します。
+ * tint...白色を加えて明度を明るくします。
+ * shade...黒色を加えて明度を暗くします。
  * z-index...z-indexの並び順を管理します。
  * tracking...Photoshopのカーニングをemに変換します。
  *
@@ -368,9 +419,11 @@ Sassの入れ子とアンパサンド（`&`）でBEMの記述を短縮するこ�
  * wrapper...最大幅を指定します。
  * grid...グリッドレイアウトを指定します。
  * media...画像とテキストが横並びになるオブジェクトです。
+ * list-unstyled...`<ul>`と`<ol>`でデフォルトスタイルをリセットします。
  * card...カードタイプのオブジェクトです。
  * split...定義リストをブロックからインラインにするオブジェクトです。
  * button...ボタンのデフォルトスタイルです。
+ * ratio...アスペクト比を固定したまま伸縮させます。
  * embed...Youtubeなどをアスペクト比を固定してレスポンシブ対応させる場合に使用します。
  *
  * PROJECT
@@ -381,6 +434,7 @@ Sassの入れ子とアンパサンド（`&`）でBEMの記述を短縮するこ�
  *
  * UTILITY
  * text...テキストのスタイルに関する汎用クラスです。
+ * margin...マージンで余白の管理をします。常にした方向にだけ余白をとります。
  * display...要素の表示や改行をコントロールする場合に使用します。
  * width...おもにグリッドで使用する`width`を指定する汎用クラスです。
  */
@@ -411,9 +465,11 @@ FLOCSSは6つのレイヤーをベースにしていますが、今どこのレ�
 @import "object/component/_wrapper";
 @import "object/component/_grid";
 @import "object/component/_media";
+@import "object/component/_list-unstyled";
 @import "object/component/_card";
 @import "object/component/_split";
 @import "object/component/_button";
+@import "object/component/_ratio";
 @import "object/component/_embed";
 ```
 
@@ -492,7 +548,7 @@ SassはCSSをプログラム的に拡張できるプリプロセッサーです�
 // @example scss - Usage
 // .foo {
 //   color: red;
-//   @include _mq-up(sm) {
+//   @include _mq-up {
 //     color: blue;
 //   }
 // }
@@ -501,16 +557,16 @@ SassはCSSをプログラム的に拡張できるプリプロセッサーです�
 // .foo {
 //   color: red;
 // }
-// @media screen and (min-width: 400px) {
+// @media screen and (min-width: 768px) {
 //   .foo {
 //     color: blue;
 //   }
 // }
 
 // @desc - メディアクエリを`min-width`で挿入します。
-// @param {String} - 引数に変数のキーワードを渡します。
+// @param {String} $breakpoint [md] - 引数に変数のキーワードを渡します。初期値は'md'です。
 // @see - $_breakpoint-up
-@mixin _mq-up($breakpoint) {
+@mixin _mq-up($breakpoint: md) {
   @if map-has-key($_breakpoint-up, $breakpoint) {
     @media #{inspect(map-get($_breakpoint-up, $breakpoint))} {
       @content;
