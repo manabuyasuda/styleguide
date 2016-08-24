@@ -161,3 +161,23 @@ object[src$=".svg"] {
   height: auto;
 }
 ```
+
+## 背景画像としてSVGを表示させる
+通常の画像と同じく`background-image`プロパティでSVGも表示させることができます。
+
+```css
+.bg {
+  background-image: url("image.svg");
+}
+```
+
+フォールバックをする場合はフォールバック用のpng画像を先に指定します。
+
+```css
+.bg {
+  background-image: url("fallback.png");
+  background-image: url("image.svg"), none;
+}
+```
+
+使用するSVGファイル内にはviewBox属性、width属性とheight属性を必ず指定します（IEとAndroid対応）。
