@@ -237,3 +237,141 @@ HTML5の仕様を踏まえて、`<i>`要素ではなく`<span>`要素でマー�
 1. `<i>`要素自体にはテキストは記述しないため、具体的な意味を持つ要素でマークアップするのは適切でないと考えられる（`before`擬似要素はHTML5の範囲に入るのか？）
 1. `<i>`要素は日本語の文章ではあまり使用されるシチュエーションがない意味（「技術用語、外国語のフレーズ、または架空の人物の思考など、何らかの理由で他のテキストと離して配置して区別されるテキスト」）を持つため、アイコンで使うのは適切でないと考えられる
 1. アイコンの意味を読み上げた場合（テキストとセットで読み上げた場合も含めて）、 アイコンを「何らかの理由で他のテキストと離して配置して区別されるテキスト」とするのは不自然だし、斜体として表現されるようなものでもない
+
+## インラインSVGで表示させる
+HTML内に`<svg>`要素で記述するインラインSVGはSVGの機能のすべてを使うことができます。ただし、HTMLファイル内にSVGコードを貼る必要がありファイルサイズを増やしてしまうので、`<img>`要素や`background-image`プロパティ、アイコンフォントで指定するのが適切でない場合に使うようにします。
+
+### 不要なコードの削除
+インラインSVGとして使う場合に不要なコードが書き出されます。随時削除（省略）するか、Gulpなどのツールで自動的に削除できるようにしておきます。
+
+- `<?xml`から始まるXML宣言の`version="1.0"`（バージョンが1.0であれば省略可）
+- `<?xml`から始まるXML宣言の`encoding="utf-8"`（UTF-8で書き出している場合は省略可）
+- `<?xml`から始まるXML宣言の`standalone="no"`
+- `<!-- Generator: Adobe Illustrator`から始まるコメント（不要）
+- `<!DOCTYPE svg PUBLIC`から始める文書型宣言（SVG1.1では非推奨）
+- `<svg>`要素の`xmlns:a=""`
+- `<svg>`要素の`x=""`と`y=""`が両方とも0(px)の場合
+- `<svg>`要素の`enable-background=""`
+- `<svg>`要素の`xml:space="preserve"`
+- `id`属性が日本語になっている場合は適切な半角英数字に修正
+
+### 必須なコード
+ルート要素となる`<SVG>`要素の属性。
+
+- `xmlns="http://www.w3.org/2000/svg"`（SVG名前空間宣言）
+- `xmlns:xlink="http://www.w3.org/1999/xlink"`（XLink名前空間宣言）
+- `version`属性
+- `width`属性と`height`属性（pxは省略可）
+- `viewBox`属性
+
+```html
+<!-- 修正前 -->
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="レイヤー1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+	 x="0px" y="0px" width="600px" height="600px" viewBox="0 0 600 600" enable-background="new 0 0 600 600" xml:space="preserve">
+<path fill="#040000" d="M492,300c0,17.695-1.536,32-19.232,32H127.231C109.567,332,108,317.695,108,300c0-17.696,1.567-32,19.231-32
+	H472.8C490.464,268,492,282.304,492,300z"/>
+</svg>
+```
+
+```html
+<!-- 修正後 -->
+<svg version="1.1" id="question_x5F_answer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600px" height="600px" viewBox="0 0 600 600">
+<path fill="#040000" d="M492,300c0,17.695-1.536,32-19.232,32H127.231C109.567,332,108,317.695,108,300c0-17.696,1.567-32,19.231-32
+	H472.8C490.464,268,492,282.304,492,300z"/>
+</svg>
+```
+
+### アクセシビリティ
+
+- [&lt;title&gt;](https://developer.mozilla.org/ja/docs/Web/SVG/Element/title)要素（タイトル）と[&lt;desc&gt;](https://developer.mozilla.org/ja/docs/Web/SVG/Element/desc)要素（説明）を指定する
+- `<title>`要素と`<desc>`要素を読み上げさせるための`aria-labelledby="title desc"`を指定する
+- 適切な`role`属性（`role="img"`や`role="link"`など）を指定する
+
+### SVGスプライト（svgstore）
+
+SVGは`<symbol>`要素と`<use>`要素でコンポーネント化ができます。これをSVGスプライト（svgstore）と呼びます。
+
+`<symbol>`要素は`<svg>`要素の中に記述し、その中にコンポーネント化したい要素を置きます。`<symbol>`要素には固有のid属性を指定しておきます。`<symbol>`要素内に記述したSVGは表示されず、`<use>`要素で参照することで表示することができます。
+
+```scss
+<svg>
+  <symbol id="svg-title-facebook" viewBox="0 0 110 110">
+    <title id="svg-title-facebook">Facebook</title>
+    <path d="M55 0C24.6 0 0 24.6 0 55s24.6 55 55 55 55-24.6 55-55S85.4 0 55 0zm14.6 54.8H60v34H45.9v-34h-6.7v-12h6.7V35c0-5.6 2.6-14.2 14.2-14.2h10.5v11.6H63c-1.2 0-3 .6-3 3.3v7.1h10.8l-1.2 12z"></path>
+  </symbol>
+</svg>
+```
+
+`<use>`要素を使ってSVGを呼び出します。`role`属性や`aria-labelledby`属性でアクセシブルにしている点に注意してください。
+
+```html
+<svg viewBox="0 0 110 110" role="img" aria-labelledby="svg-title-facebook">
+  <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#svg-title-facebook"></use>
+</svg>
+```
+
+SVGスプライトはEJSやJadeのようなテンプレートエンジンで外部ファイル化をすると管理がしやすくなります。
+
+注意点。
+
+- IEとEdgeは`<use>`要素による外部SVGファイルの参照ができないため、`<body>`要素直下にSVGファイルを直書きする
+- `<defs>`要素よりも`<symbol>`要素の方が柔軟に指定できる（サイズの変更ができる）ためSVGスプライトは`<symbol>`要素で定義する
+
+### CSS
+
+SVGで指定できるCSSは限定されています。またSVG独自のプロパティも用意されています。例えば以下のようなプロパティがあります。
+
+- stroke（線の色）
+- stroke-width（線の幅）
+- fill（塗りの色）
+- fill-opacity（塗りの透明度）
+- stroke-dasharray（線の長さ）
+- stroke-dashoffset（線の開始位置）
+
+インラインSVGには`height:auto;`が効かないので、フルードイメージにする場合は以下のCSSを指定します。
+
+```scss
+.c-embed {
+  display: block;
+  overflow: hidden;
+  position: relative;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  .c-embed__item,
+  iframe,
+  embed,
+  object,
+  video {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    border: 0;
+  }
+}
+
+/**
+ * アスペクト比 16:9
+ */
+.c-embed--16to9 {
+  /* （横幅 / 高さ） * 100% */
+  padding-bottom: percentage(9 / 16) !important;
+}
+```
+
+### リンク
+インラインSVGにリンクを貼る場合`<a>`要素で`<svg>`要素を囲んでも動作しません。`<svg>`要素内のタグを`<a>`要素で囲み、`xlink:href`属性でリンク先を指定します。
+
+```html
+<svg>
+  <a xlink:href="#">
+    <path></path>
+  </a>
+</svg>
+```
