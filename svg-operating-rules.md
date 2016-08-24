@@ -153,9 +153,10 @@ object {
 ### フルードイメージ
 `<img>`要素と`<object>`要素をフルードイメージにする場合はCSSで以下のように指定します。
 
-```scss
-img[src$=".svg"],
-object[src$=".svg"] {
+```css
+/* 属性値が.svgで終わる要素に適応 */
+[src$=".svg"],
+[data$=".svg"] {
   max-width: 100%;
   width: 100%; /* IE対応 */
   height: auto;
