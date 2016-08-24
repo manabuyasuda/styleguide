@@ -375,3 +375,9 @@ SVGで指定できるCSSは限定されています。またSVG独自のプロ�
   </a>
 </svg>
 ```
+
+
+## 参考リンク
+- [SVG 1.1 仕様 （第２版） 日本語訳](https://triple-underscore.github.io/SVG11/index.html)
+- [SVG | MDN](https://developer.mozilla.org/ja/docs/Web/SVG)
+- [svg要素の基本的な使い方まとめ](http://www.h2.dion.ne.jp/~defghi/svgMemo/svgMemo.htm)
