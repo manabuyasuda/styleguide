@@ -85,3 +85,79 @@ Illustratorを使った場合の書き出しに関する注意点をまとめて
 インラインSVGで使う場合はパスをコピーして、テキストエディタにペーストすることもできます。
 
 Illustrator CCを使っている場合は[画像アセットとして書き出す](https://helpx.adobe.com/jp/illustrator/using/collect-assets-export-for-screens.html)ことができます。
+
+## SVGをimg要素で表示させる
+pngで表示していたような画像の代わりとしてSVGを使うのがいちばん手軽な方法です。通常の画像と同じように`<img>`要素で指定します。
+
+```html
+<img src="image.svg" alt="">
+```
+
+使用するSVGファイル内には`viewBox`属性、`width`属性と`height`属性を必ず指定します（IEとAndroid対応）。
+
+### バグフィックス
+
+SVGファイル内で`width`と`height`属性が指定されていない場合にIEとAndroidでアスペクト比がおかしくなることがあります。`width`と`height`属性を指定し直します。
+
+`preserveAspectRatio="none"`をSVGファイルに指定して直す方法もあります。仕様上、viewBoxのアスペクト比と`width`と`height`属性でのアスペクト比が異なる場合、アスペクト比と維持しながらスケーリングし、中央寄せで表示されます。`preserveAspectRatio`属性はこの挙動を変更するもので、`none`と指定することでHTML側で指定したサイズでviewBoxがフィットするようになります。
+
+### フォールバック
+フォールバックは処理が冗長になるので、IE8に対応するのであればSVGは使わないようにするのがベターです。
+
+SVG非対応ブラウザ向けのフォールバックにはHTMLでの対応とJavaScriptでの対応の2パターンがあります。
+
+HTML側で対応する場合は`<img>`要素ではなく、`<object>`要素を使います。`<object>`要素は下記のようにフォールバックを含めた記述ができます。
+
+```html
+<object data="image.svg" type="image/svg+xml" width="100" height="100">
+　<object data="fallback.png" type="image/png" width="100" height="100">
+　</object>
+</object>
+```
+
+JavaScript側で対応する場合は、SVG非対応ブラウザのときには.svgを.pngに置換します。
+
+```js
+if(!window.SVGSVGElement){ //SVG非対応ブラウザの判別
+  $('img[src*="svg"]').attr('src', function() {
+    return $(this).attr('src').replace('.svg','.png'); //拡張子を置換
+  });
+}
+```
+
+フォールバック画像の作成は[svg2png](https://www.npmjs.com/package/gulp-svg2png)などで自動的に生成することができます。
+
+`<a>`要素を`<object>`要素でラップする場合、リンクがクリックできなくなります（`<img>`要素は問題ありません）。
+
+```html
+<a href="#">
+  <object data="image.svg" type="image/svg+xml" width="100" height="100">
+　  <object data="fallback.png" type="image/png" width="100" height="100">
+　  </object>
+  </object>
+</a>
+```
+
+CSSでは以下のように指定するとリンクをクリックできるようになります。
+
+```css
+a {
+　　display: inline-block; /* もしくは`display:block;` */
+}
+
+object {
+　　pointer-events: none; /* IE10以下未対応 */
+}
+```
+
+### フルードイメージ
+`<img>`要素と`<object>`要素をフルードイメージにする場合はCSSで以下のように指定します。
+
+```scss
+img[src$=".svg"],
+object[src$=".svg"] {
+  max-width: 100%;
+  width: 100%; /* IE対応 */
+  height: auto;
+}
+```
