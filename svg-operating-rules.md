@@ -181,3 +181,59 @@ object[src$=".svg"] {
 ```
 
 使用するSVGファイル内にはviewBox属性、width属性とheight属性を必ず指定します（IEとAndroid対応）。
+
+## SVGをアイコンフォントで使う
+SVGのアイコンの数が多い、色を変更する必要がある、複数箇所で指定する場合はアイコンフォントとして使います。
+
+### アイコンフォントの生成
+Gulpなどで自動でアイコンフォントを生成する環境を作るのが理想的です。
+
+- [gulp-iconfont](https://www.npmjs.com/package/gulp-iconfont)
+- [gulp-iconfont-css](https://www.npmjs.com/package/gulp-iconfont-css)
+
+Gulpを使わない場合は以下のようなツールを使って管理します。
+
+- [icoMoon](https://icomoon.io/)
+- [Font Awesome](http://fontawesome.io/)
+
+### マークアップ
+マークアップ時の注意点として、アイコンフォントを擬似要素で表示させる場合にスクリーンリーダーが`content`内の意味のない単語を読み上げてしまう問題があります。WAI-ARIAを使用して以下のような対応をします。
+
+- `aria-hidden="true"`を指定して読み上げを防止します
+- アイコンとテキストをセットにして、アイコンが表示できない場合でも意味が伝わるようにします
+- テキストを非表示したうえで読み上げはできる`.sr-only`のようなクラスを使用します
+- `aria-label=""`で読み上げさせるテキストを記述します
+
+```html
+<span class="p-icon p-icon--home" aria-hidden="true"></span>ホーム
+
+<span class="p-icon p-icon--home" aria-hidden="true"></span>
+<span class="u-sr-only">ホーム</span>
+
+<span class="p-icon p-icon--home" aria-label="ホーム"></span>
+```
+
+```css
+.u-sr-only {
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important; 
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+```
+
+`aria-hidden="true"`はテキストを併記できる場合やアイコン自体の意味を伝える必要がない（装飾的な場合）に指定します。  
+`aria-label=""`はアイコンだけで意味を伝える必要がある場合に指定します。例えばパンくずリストでホームアイコンだけを表示している場合などがそれに当たります。
+
+読み上げをさせなくさせるCSSの`sperk:none;`はほとんどの視覚系ブラウザ（ChromeやIEなど）やスクリーンリーダーで対応していません。なので、`<span>`で空タグを作ってアイコンを表示、`aria-hidden="true"`や`aria-label=""`で読み上げに対応するというのが現時点でのベタープラクティスです。
+
+HTML5の仕様を踏まえて、`<i>`要素ではなく`<span>`要素でマークアップします。理由は以下の通りです。
+
+1. `aria-hidden="true"`で読み上げを防止するようなアイコンは装飾的だと考えられるので`<span>`要素が適切
+1. `<i>`要素自体にはテキストは記述しないため、具体的な意味を持つ要素でマークアップするのは適切でないと考えられる（`before`擬似要素はHTML5の範囲に入るのか？）
+1. `<i>`要素は日本語の文章ではあまり使用されるシチュエーションがない意味（「技術用語、外国語のフレーズ、または架空の人物の思考など、何らかの理由で他のテキストと離して配置して区別されるテキスト」）を持つため、アイコンで使うのは適切でないと考えられる
+1. アイコンの意味を読み上げた場合（テキストとセットで読み上げた場合も含めて）、 アイコンを「何らかの理由で他のテキストと離して配置して区別されるテキスト」とするのは不自然だし、斜体として表現されるようなものでもない
