@@ -1,257 +1,267 @@
 # CSSコーディングルール
-## CSSプリプロセッサー
-CSSプリプロセッサーにはSassのscss記法を使います。CSSをそのまま書けること、CSSプリプロセッサーのデフォルトスタンダードになっているので参考になるコードが豊富にあることがその理由です。
-
-## ファイル構成
-詳細度の強さやスコープの範囲を管理するために[FLOCSS](https://github.com/hiloki/flocss)をベースにしたファイル構成にします。
+## ファイル・ディレクトリ構成
+ファイルの構成は[FLOCSS](https://github.com/hiloki/flocss)をベースにします。Scopeレイヤーは（ページ内の小さな範囲からページ単位までの）ある範囲をスコープとして、Foundation、Layout、Objectのレイヤーのスタイルを上書きするためのレイヤーです。その他の追加しているレイヤーに関しては後述します。
 
 ```
 root
-├── assets
-│   ├── css
-│   │   ├── foundation
-│   │   │   ├── base
-│   │   │   ├── function
-│   │   │   ├── mixin
-│   │   │   ├── variable
-│   │   │   └── vendor
-│   │   ├── layout
-│   │   ├── object
-│   │   │   ├── component
-│   │   │   ├── project
-│   │   │   ├── scope
-│   │   │   └── utility
-│   │   └── style.scss
-│   ├── image
-│   └── js
-├── common
-│   ├── image
-├── image
-│   ├── content
-│   ├── info
-│   └── intro
-├── index.html
-└── page1
-    ├── common
-    │   └── image
-    ├── image
-    │   ├── content
-    │   ├── info
-    │   └── intro
-    ├── index.html
-    └── page1-1
+└── assets/
+    └── css/
+        ├── common.scss
+        ├── foundation/
+        │   ├── base/
+        │   ├── function/
+        │   ├── mixin/
+        │   └── variable/
+        ├── layout/
+        ├── object/
+        │   ├── component/
+        │   ├── project/
+        │   └── utility/
+        └── scope/
 ```
 
-assets/cssにはサイトで指定するスタイルをすべて置きます。object/scopeレイヤーにページ固有のスタイルを指定します。assets/cssディレクトリ以外にはCSSファイルは存在しません。
-
-もし、以下のような特徴のあるサイトの場合はディレクトリごとやファイルごとにCSSファイルを置くことを検討します。
-
-* 静的サイトで運用をしていく
-* ページごとに大きくデザインが変わることが多い
-* 運用フェーズではSassを使わない 
+スタイルは基本的に`/assets/css/common.scss`で出力しますが、ページ特有のスタイルが多く出る場合は`css/pagename.scss`のようにページ専用のスタイルシートを作ることもできます。
 
 ```
 root
-├── assets
-│   ├── css
-│   │   ├── foundation
-│   │   │   ├── base
-│   │   │   ├── function
-│   │   │   ├── mixin
-│   │   │   ├── variable
-│   │   │   └── vendor
-│   │   ├── layout
-│   │   ├── object
-│   │   │   ├── component
-│   │   │   ├── project
-│   │   │   ├── scope
-│   │   │   └── utility
-│   │   └── style.scss
-│   ├── image
-│   └── js
-├── common
-│   ├── css
-│   │   └── common.scss
-│   ├── image
-│   └── js
-├── css
-│   └── single.scss
-├── image
-│   ├── content
-│   ├── info
-│   └── intro
+├── assets/
+│   └── css/
+│       ├── common.scss
+│       ├── foundation/
+│       │   ├── base/
+│       │   ├── function/
+│       │   ├── mixin/
+│       │   └── variable/
+│       ├── layout/
+│       ├── object/
+│       │   ├── component/
+│       │   ├── project/
+│       │   └── utility/
+│       └── scope/
+├── css/
+│   └── index.scss
 ├── index.html
-├── js
-└── page1
-    ├── common
-    │   ├── css
-    │   │   └── common.scss
-    │   ├── image
-    │   └── js
-    ├── css
-    │   └── single.scss
-    ├── image
-    │   ├── content
-    │   ├── info
-    │   └── intro
-    ├── index.html
-    ├── js
-    └── page1-1
+└── page/
+    ├── css/
+    │   └── index.scss
+    └── index.html
 ```
 
-* assets/cssにはサイト共通のスタイルを置きます。
-* common/css/common.scssにはディレクトリ共通のスタイルを置きます。
-* css/single.scssにはページ専用のスタイルを置きます。
+無理に1つのCSSとして管理するより、以下のようにHTMLから優先度が把握できるほうがスタイルの追加が容易になり、`common.css`の肥大化・複雑化を防ぐことができます。
 
-CSSは1つのファイルにまとめようとせず、組み合わせて使うようにします。ファイルを分割することで読み込み順を管理しやすくなり、カスケーディングやクラス名をシンプルにすることができます。
+```html
+<link rel="stylesheet" href="/assets/css/common.css">
+<link rel="stylesheet" href="/css/index.css">
+```
 
-### FLOCSS
-
+### FLOCSSの基本
 FLOCSSはFoundation、Layout、Objectの3つのレイヤーとComponent、Project、Utilityの3つの子レイヤーから構成されます。
 
-1. Foundation - Normalize.cssなどのリセットCSSや要素セレクタ・属性セレクタのような最低限のスタイルを指定します。詳細度を極力弱く、影響範囲を極力狭くします。
-1. Layout - ワイヤーフレームに定義されるような大きな単位のコンテナブロックが該当します。このレイヤー以降はクラスセレクタのみを指定します。例外として、このLayoutレイヤーにだけは必要に応じてidセレクタを指定することもできます。
-1. Object - OOCSSのコンセプトをもとにしたビジュアルパターンが主に該当します。ObjectレイヤーはComponent、Project、Utilityの3つの子レイヤーにわけられます。
-1. Component - 多くのプロジェクトで横断的に再利用できるような小さな単位のモジュールが該当します。OOCSSの構造の機能を担い、固有のサイズや装飾的なスタイルを極力含まないようにします。
-1. Project - プロジェクト固有のスタイルが該当します。プロジェクトで使い回すスタイルのほとんどはProjectレイヤーに追加することになります。
-1. Utility - いわゆる汎用クラスのことで、ほとんどの場合で単一のスタイルを持っています。確実にスタイルを適応させるために`!important`を指定します。
+#### 1. Foundation
+Foundationレイヤーでは`html`や`body`のような広範囲にわたるベーススタイル、`h2`や`ul`のような基本的なタイプセレクタのデフォルトスタイルを定義します。装飾的なスタイルは避けて、できる限り低詳細度に保ちます。idセレクタやclassセレクタは使用しません。
 
-### レイヤーの追加
-FLOCSSのファイル構成案にはレイヤーを追加することもできます。
+Foundationレイヤーにはレイヤーを追加するため、normalize.cssやベーススタイルは`foundation/base`レイヤーに指定します。
 
-* Variable - プロジェクトで使用されるグローバル変数
-* Function - プロジェクトで使用されるグローバルなfunction
-* Mixin - プロジェクトで使用されるグローバルなmixin
-* Vendor - Normalize.cssやBootstrapのような外部のライブラリやフレームワーク
-* Vendor-extension - Vendorレイヤーの上書き（オーバーライド）
-* Theme - SMACSSのThemeモジュールに該当するテーマによる色の切り替えなど
-* Scope - コンポーネント単位ではなく、ページ単位でスタイルを調整したいときなど
-* QA/Test - Quality Assurance（品質保証）、もしくはテストのための一次的なスタイル
+```scss
+@import "foundation/base/_normalize";
+@import "foundation/base/_base";
+```
+
+#### 2. Layout
+Layoutレイヤーはヘッダーやフッターのような、ページを構成するコンテナブロックのスタイルを定義します。目安としてはワイヤーフレームに書かれるような大きな単位のブロックです。汎用性のあるグリッドシステムは次のObject/Componentレイヤーで定義します。
+
+ヘッダーにあるロゴやグローバルナビゲーションのレイアウトの役割を持つことができます。グローバルナビゲーションやコピーライトのようなコンポーネントは、Object/Projectレイヤーで定義します。基本的にはclass属性を使用しますが、id属性を使用することもできます。
+
+プレフィックス（接頭辞）として`l-`をつけます。
+
+```scss
+@import "layout/_header";
+@import "layout/_footer";
+@import "layout/_main";
+```
+
+#### 3. Object
+Objectレイヤーはプロジェクトにおけるビジュアルパターンです。抽象度や詳細度、拡張性などによって、3つのレイヤーにわけられます。
+
+1. Component（`c-`）
+2. Project（`p-`）
+3. Utility（`u-`）
+
+#### 3.1 Component
+Componentレイヤーは多くのプロジェクトで横断的に再利用のできるような、小さな単位のモジュール（機能）です。
+
+OOCSSの構造（structure）の機能を担うため、装飾的なスタイルをできるだけ含めないようにします。また、`width`や`margin`といったレイアウトに影響を与えるプロパティもできるだけ含めないようにします。
+
+プレフィックス（接頭辞）として`c-`をつけます。
+
+```scss
+@import "object/component/_list-ordered";
+@import "object/component/_media";
+@import "object/component/_layout";
+@import "object/component/_wrapper";
+```
+
+#### 3.2 Project
+Projectレイヤーはプロジェクト固有のパターンで、複数のページで使い回せるようなコンポーネントです。具体的なスタイルを持つUI（ユーザーフェイス）で、追加されるコンポーネントのほとんどはこのレイヤーに置かれます。
+
+構造的なパターンでも、（ボタンのように）装飾的に拡張されるのであればProjectレイヤーに置きます。
+
+もし、このレイヤーで同じパターンが3箇所で使われていたら、別のコンポーネント（構造部分だけのパターンならComponentレイヤー、それ以外ならProjectレイヤー）としてまとめられないか検討しましょう。
+
+プレフィックス（接頭辞）として`p-`をつけます。
+
+```scss
+@import "object/project/_icon";
+@import "object/project/_icon-extend";
+@import "object/project/_label";
+@import "object/project/_button";
+```
+
+#### 3.3 Utility
+Utilityレイヤーはいわゆる汎用クラスで、ほとんどの場合は単一のスタイルをもっています。コンポーネント間の間隔を調整したり、BEMのModifierが増えすぎるのを防ぎます。
+
+`.mb10`のような具体的な名前より`.mb-small`のような相対的な名前にしたり、pxよりもemや%で指定することを推奨します。確実にスタイルを適応させるために`!important`を使用します。
+
+プレフィックス（接頭辞）として`u-`をつけます。
+
+```scss
+@import "object/utility/_text";
+@import "object/utility/_heading";
+@import "object/utility/_align";
+@import "object/utility/_display";
+@import "object/utility/_sr-only";
+@import "object/utility/_width";
+@import "object/utility/_margin";
+@import "object/utility/_section";
+```
+
+### 追加するレイヤー
+FLOCSSのファイル構成に4つのレイヤーを標準で追加します。
+
+#### 1.1 Variable
+プロジェクト全体で使われる変数を定義します。例えば以下のように、基本的な変数を定義する`global.scss`とブレイクポイント、色、font-familyを定義するファイルを分割すると見通しがよくなります。
+
+```scss
+@import "foundation/variable/_global";
+@import "foundation/variable/_breakpoint";
+@import "foundation/variable/_font-family";
+@import "foundation/variable/_color";
+```
+
+Sass（scss記法）で変数を定義する場合は以下のことに気をつけます。
+
+- `!default`フラグを指定することで、先に読み込んだ変数が適応されるルールに統一します。
+- `$pn-`(Project name)のようにプレフィックスを付けることで名前の衝突を防ぎます。
+- ハイフン（`-`）とアンダースコア（`_`）は同一と見なされるので、どちらか一方だけを使います。
+- 3箇所以上で使われる共通の値やプロジェクトに関わらず利用できる値だけを定義します。
+
+#### 1.2 Function
+Sassで使用できるfunctionを機能ごとに定義します。例えばpxをremに変換したり、PhotoShopのトラッキングをemに変換するfunctionなどです。
+
+```scss
+@import "foundation/function/_em";
+@import "foundation/function/_rem";
+@import "foundation/function/_tracking";
+```
+
+#### 1.3 Mixin
+Sassで使用できるmixinを機能ごとに定義します。例えばメディアクエリやclearfix、再利用できるオブジェクトのベーススタイルなどです。
+
+```scss
+@import "foundation/mixin/_mq-up";
+@import "foundation/mixin/_mq-down";
+@import "foundation/mixin/_clearfix";
+@import "foundation/mixin/_media";
+```
+
+#### 1.4 Base
+normalize.cssや要素セレクタ・属性セレクタのデフォルトスタイルを指定します。
+
+```scss
+@import "foundation/base/_normalize";
+@import "foundation/base/_base";
+```
+
+#### 4. Scope
+ComponentレイヤーやProjectレイヤーのようなコンポーネント単位ではなく、ページ単位や任意の範囲（スコープ）でのスタイルを定義します。1箇所でしか使わないような特異なスタイルや、ページ単位でComponentやProjectレイヤーのスタイルを微調整したい場合に使用してもかまいません。
+
+例えばブログページのスタイルとして_blog.scssを作成します。このレイヤーでは`.s-blog p`のような要素セレクタとの結合子も使うこともできます。  
+もし、このレイヤーで同じパターンが3箇所で使われていたら、ProjectレイヤーやUtilityレイヤーでまとめられないか検討しましょう。
+
+プレフィックス（接頭辞）として`s-`をつけます。
+
+```scss
+@import "scope/_blog";
+```
+
+#### その他のレイヤー
+その他にもレイヤーを追加することもできます。
+
+- Theme - SMACSSのThemeモジュールに該当するテーマによる色の切り替えなど
+- QA/Test - Quality Assurance（品質保証）、もしくはテストのための一次的なスタイル
 
 レイヤーの追加は以下のリンクを参考にします。
 
 * [More Transparent UI Code with Namespaces](http://csswizardry.com/2015/03/more-transparent-ui-code-with-namespaces/)
 * [Managing CSS Projects with ITCSS](http://csswizardry.net/talks/2014/11/itcss-dafed.pdf)
 
-レイヤーを追加した場合は以下のようになります。Vendorレイヤーは含んでいるライブラリなどの特徴（主に詳細度）によって読み込む順番を変更します。
+#### モジュール化
+LayoutレイヤーとObjectレイヤー内のモジュールは機能ごとにファイルに分割します。モジュールは後述するBEMをベースに名前をつけ、モジュール名とファイル名は一致するようにします。
 
-1. Foundation
- 1. Variable
- 1. Function
- 1. Mixin
- 1. Vendor
- 1. Vendor-extension
- 1. Base
-1. Layout
-1. Object
- 1. Component
- 1. Project
- 1. Theme
- 1. Scope
- 1. Utility
- 1. QA/Test
- 
-### モジュール化
-Sassのパーシャルと`@import`を使って、機能や用途ごとにファイルをモジュール化します。例えばグリッドレイアウトは`_grid.scss`に、変数は`_variable.scss`のようにまとめます。ファイル名とディレクトリ名はgridsやvariablesのように複数形にはしません。
+- `.grid` => `_grid.scss`
+- `.button` => `_button.scss`
 
-クラス名とファイル名は一致するようにします。例えば`_grid.scss`の中には`.grid`や`.grid__item`を指定します。
+#### モジュールの粒度
+モジューツを適切な粒度（受け持つ機能の大きさ）にするために、以下の3つの粒度でモジュールを分類し、小さなモジュールから読み込みます。
 
-ページ専用のCSSファイルは量が少なければモジュール化はしません。
+1. Small Block
+1. Medium Block
+1. Large Block
+
+##### 1. Small Block
+Small Blockはリスト、ボタン、ラベルのような比較的小さく、内包されるBlockです。Medium BlockとLarge Blockによって、スタイルが上書きされる可能性があります。
+
+##### 2. Medium Block
+Medium BlockはSmall Blockを内包することができる、小さなレイアウトを担当するBlockです。例えば、`.media`や`button-group`のようなBlockです。
+
+Medium BlockはSmall Blockのスタイルを一部上書きすることができます。
+
+##### 3. Large Block
+Large BlockはSmall BlockやMedium Blockを内包することができる、大きなレイアウトを担当するBlockです。例えば、`.grid`や`.wrapper`のようなBlockです。
+
+Large BlockはSmall BlockとMedium Blockを内包することができますが、スタイルを上書きすることはできません。
+
+#### レイヤーの順序
+カスケーディングを管理するため、レイヤーを読み込ませる順序は
+
+- 低詳細度から高詳細度
+- 抽象的なスタイルから具体的なスタイル
+- カスケーディングを許容するモジュールからカスケーディングを許容しないモジュール
+
+のようにする必要があります。例えば以下のようなディレクトリ構造になります。
+
+```scss
+@import "foundation/";
+@import "layout/";
+@import "object/component/";
+@import "object/project/";
+@import "object/utility/";
+@import "scope/";
+@import "theme/";
+@import "qa/";
+```
+
+#### 外部ライブラリのレイヤー
+JQueryのプラグイン、CSSフレームワークやライブラリを読み込ませる順序は「レイヤーの順序」で示した基準を使います。外部ライブラリであっても、役割や機能が変わることはないからです。  
+例えば、normalize.cssは`foundation/base/`、スライダーのようなJQueryプラグインは`object/project/`のMedium Blockが適切な位置になるでしょう。
+
+外部ライブラリは基本的にファイルを直接上書きせず、`libraryname-extend.scss`のようなファイルを作成し、上書きをします。
 
 ## 命名規則
-ルールを決めずに安易にコードを増やしてしまうと、名前が重複し、意図しないスタイルが適応されてしまう恐れがあります。ライブラリやフレームワークを併用する場合も同様です。また、クラス名で役割を示すことでコードの理解を助けることもできます。
-
-### 接頭辞（Prefix）
-役割を示したり、名前の重複をさせないために接頭辞をつけます。FLOCSSで推奨されている接頭辞といくつかの接頭辞を使用します。
-
-* `.l-` Layoutレイヤー
-* `.c-` Componentレイヤー
-* `.p-` Projectレイヤー
-* `.u-` Utilityレイヤー
-* `.t-` Themeレイアー
-* `.s-` Scopeレイヤー
-* `.qa-` `.te-` QA/Testレイヤー
-* `.is-` クリックなどのイベントが発生している要素に付与する
-* `.js-` JavaScriptから参照される要素
-* `.cp-` あるHTML専用のCSSファイル（current pageの略称で名前を変更することもできます）
-
-
-### 接尾辞（Suffix）
-ブレイクポイントの指定しているクラス名の最後には`-sm`や`-md`のようにブレイクポイントのキーワードをつけます。
-
-ブレイクポイントはグローバル変数として定義しておき、そのキーをクラス名にも使うようにします。
-
-```scss
-$_breakpoint-up: (
-  'sm': 'screen and (min-width: 400px)',
-  'md': 'screen and (min-width: 768px)',
-  'lg': 'screen and (min-width: 1000px)',
-  'xl': 'screen and (min-width: 1200px)',
-) !default;
-```
-
-```scss
-@media (min-width: 400px) {
-  .u-dn-sm { display: none; }
-}
-
-@media (min-width: 768px) {
-  .u-dn-md { display: none; }
-}
-
-@media (min-width: 1000px) {
-  .u-dn-lg { display: none; }
-}
-
-@media (min-width: 1200px) {
-  .u-dn-xl { display: none; }
-}
-```
-
-メディアクエリは`min-width`を優先的に使うので`-sm`などとします。`max-width`のパターンも作る場合は`-sm-down`などとします。
-
-### 単語の省略を制限する
-基本的にセレクタ名の単語は省略しないようにします。省略する場合もセレクタ名が何をあらわしているのかを分かるようにします。
-
-例えば`navigation`を`nav`と省略することはできますが、`title`を`ttl`としても単語数が大きく減っていることもなく、意味が汲み取りにくくなるので省略しません。
-
-```scss
-// Good
-.navigation {}
-.title {}
-.text {}
-.icon {}
-
-// allow
-.nav {}
-
-// Bad
-.ttl {}
-.txt {}
-.ico {}
-```
-
-### 絶対値をあらわすクラス名を避ける
-`.mb10`（`margin-bottom:10px;`）のような値を固定した名前をつけることは避けます。固定値ではレスポンシブなどで柔軟に対応することが難しいからです。相対的な名前か、そのコンポーネント専用の名前をつけます。
-
-相対的な名前は`.mbs`（margin-bottom smallの意味）のようにします。small, medium, largeのようなパターンに制限するルールを設けることで、際限なくサイズ違いが増えてしまうことを防ぐこともできます。
-
-コンポーネント専用の名前は`component-name__title01`のようにコンポーネントの名前を引き継ぎ、パーツの名前と連番で管理します。必ずコメントをつけて、なぜ必要なのかを書いておきます。
-
-カラーネーム（`.red`や`.blue`）のようなクラス名も禁止します。`.success`や`.brand`のようなスタイルを変更しても意図が変わらない名前にしましょう。
-
-```scss
-// Good
-.brand {}
-.success {}
-
-// Bad
-.red {}
-.blue {}
-```
+命名規則はBEM（MindBEMding）をベースとし、レイヤーごとにプレフィックスをつけることで名前空間とし、ブレイクポイントをもつモジュールにはサフィックス（接尾辞）をつけることで名前のブレを防ぎます。
 
 ### BEM（MindBEMding）
-名前は[BEM](https://github.com/juno/bem-methodology-ja/blob/master/definitions.md)をベースにした[MindBEMding](http://csswizardry.com/2013/01/mindbemding-getting-your-head-round-bem-syntax/)を使用します。BEMには役割や関係性を明確にできるメリットがあります。
+[BEM](https://github.com/juno/bem-methodology-ja/blob/master/definitions.md)をベースにした[MindBEMding](http://csswizardry.com/2013/01/mindbemding-getting-your-head-round-bem-syntax/)を使用します。BEMには役割や関係性を明確にできるメリットがあります。
 
 BEMはBlock、Element、Modifierの3つの概念から構成され、以下のようなクラス名になります。
 
@@ -281,7 +291,7 @@ BEMはBlock、Element、Modifierの3つの概念から構成され、以下の�
 ```
 
 #### BEMの注意点
-Elementを入れ子にするときに`.block__element__element`のような名前にならないようにします。HTMLの構造を示すのではなく、Blockに対するElementとModifierの関係性を示します。
+Elementを入れ子にするときに`.block__element__element`のような名前にできるだけならないようにします。HTMLの構造を示すのではなく、Blockに対するElementとModifierの関係性を示します。
 
 ```scss
 // Good
@@ -317,7 +327,7 @@ Blockを親セレクタにしてElementとModifierを指定しません。スコ
 .block .block--modifier {}
 ```
 
-Blockのスタイルを上書きするときに詳細度を変えないようにします。例えば、`.block1`のスタイルを変更するために`.block2`を親セレクタにして`.block1`を上書きするような指定はできるだけ避けます。同じ詳細度のセレクタであとから読み込ませることで上書きするようにします。（例外としてComponentレイヤーのスタイルをProjectレイヤーのスタイルで上書きすることはできます。）
+Blockのスタイルを上書きするときに詳細度を変えないようにします。例えば、`.block1`のスタイルを変更するために`.block2`を親セレクタにして`.block1`を上書きするような指定はできるだけ避けます。同じ詳細度のセレクタであとから読み込ませることで上書きするようにします。
 
 ```scss
 // Good
@@ -332,6 +342,11 @@ Blockのスタイルを上書きするときに詳細度を変えないように
 
 .block2 .block1 {}
 ```
+
+FLOCSSにカスケーディングに関するルールを2つ追加しています。
+
+1. 同じProjectレイヤーでもMedium BlockはSmall Blockのスタイルを一部上書きすることができます。
+1. Scopeレイヤー、Themeレイヤー、QAレイヤーはそれまでのレイヤーを上書きすることができます。
 
 Sassの入れ子とアンパサンド（`&`）でBEMの記述を短縮することができますが、基本的に使わないようにします。1つ目の理由は入れ子のElementが増えると、今のアンパサンドがどこまでのElementとModifierを含んでいるのかを把握しにくくなるからです。
 
@@ -372,84 +387,82 @@ Sassの入れ子とアンパサンド（`&`）でBEMの記述を短縮するこ�
 その他のBEMに関する注意点などは[BEM(MindBEMding)によるCSS設計](https://github.com/manabuyasuda/styleguide/blob/master/how-to-bem.md)を参照してください。
 
 ## コメント
-コメントにはコードを理解しやすくするような補足情報を書きます。例えば、全体像を把握するための目次や区切りを分かりやすくする見出し、コード自体の補足、なぜそうしたのか、今後どう変えていきたいのかといった情報です。
+コメントにはコードだけでは理解できない（しにくい）情報を残します。例えば以下のようなものです。
+
+- 全体を見渡せるような目次
+- レイヤーやモジュールの区切りをわかりやすくするための見出し
+- なぜその実装方法を選んだのかという理由
+- コードの整理をしたい、バグを修正したいといった、コードからはわからない情報
+- コード自体の補足
 
 ### 目次（Table of Contents）
-全体のボリュームやどんなスタイルが用意されているのかを知らずに、スタイルを追加することほど怖いことはありません。スタイルシートのはじめには、用意されているスタイルと説明を目次にして書いておきます。
+スタイルシートのボリュームが一定以上になると全体の把握は難しくなります。CSSでもSassでも利用できる目次をスタイルシートのはじめに用意しておくことを推奨します。
 
 ```scss
 /**
- * FUNCTION
- * strip-unit...pxやremなどの単位を取り除きます。
- * em...pxをemに変換します。
- * rem...pxをremに変換します。
- * tint...白色を加えて明度を明るくします。
- * shade...黒色を加えて明度を暗くします。
- * z-index...z-indexの並び順を管理します。
- * tracking...Photoshopのカーニングをemに変換します。
- *
  * VARIABLE
- * common...グローバルに使用するサイズや数値に関する変数です。
+ * global...サイト全体に使用するサイズや数値に関する変数です。
  * breakpoint...メディアクエリで使用するブレイクポイントです。
  * font-family...font-family指定をまとめています。
  * color...グローバルに使用する色指定です。
- * z-index...z-indexの並び順を管理します。
- * easing...cubic-bezier関数を使用したタイミング関数を定義しています。
+ *
+ * FUNCTION
+ * em...pxをemに変換します。
+ * rem...pxをremに変換します。
+ * tracking...Photoshopのカーニングをemに変換します。
  *
  * MIXIN
- * media-query...メディアクエリを呼び出します。
+ * mq-up...メディアクエリを`min-width`で挿入します。
+ * mq-down...メディアクエリを`max-width`で挿入します。
  * responsive...レスポンシブ対応クラスを生成します。
- * clearfix...floatの解除をします。
  * on-event...:hover, :active, :focusをまとめて指定します。
+ * clearfix...floatの解除をします。
  * sr-only...非表示にしてスクリーンリーダーにだけ読み上げさせます。
- *
- * VENDOR
- * normalize...Normalize.cssをインポートしています。
+ * list-unstyled...list-unstyledオブジェクトのベーススタイルです。
+ * list-mark...list-markオブジェクトのベーススタイルです。
+ * media...mediaオブジェクトのベーススタイルです。
+ * flag...flagオブジェクトのベーススタイルです。
+ * ratio...ratioオブジェクトのベーススタイルです。
+ * layout...layoutオブジェクトのベーススタイルです。
  *
  * BASE
+ * normalize...Normalize.cssをインポートしています。
  * base...タイプセレクタと属性セレクタのデフォルトスタイルです。
  *
  * LAYOUT
- * header...ヘッダーエリアのコンテナブロックのスタイルです。
- * footer...フッターエリアのコンテナブロックのスタイルです。
- * main...コンテンツエリアのコンテナブロックのスタイルです。
- * sidebar...サイドバーエリアのコンテナブロックのスタイルです。
+ * header...`<body>`タグ直下にある`<header>`タグのスタイルです。
+ * footer...`<body>`タグ直下にある`<footer>`タグのスタイルです。
+ * main...`<main>`タグのスタイルです。
  *
  * COMPONENT
+ * list-ordered...番号付きリストを入れ子レベルに応じて、1, 1.1のように区切り文字を付け加えます。
+ * media...画像とテキストが横並びになるオブジェクトです。テキストを画像に回り込みさせます。
+ * layout...汎用的なレイアウトオブジェクトです。グリッドレイアウトなどに使用できます。
  * wrapper...最大幅を指定します。
- * grid...グリッドレイアウトを指定します。
- * media...画像とテキストが横並びになるオブジェクトです。
- * list-unstyled...`<ul>`と`<ol>`でデフォルトスタイルをリセットします。
- * card...カードタイプのオブジェクトです。
- * split...定義リストをブロックからインラインにするオブジェクトです。
- * button...ボタンのデフォルトスタイルです。
- * ratio...アスペクト比を固定したまま伸縮させます。
- * embed...Youtubeなどをアスペクト比を固定してレスポンシブ対応させる場合に使用します。
  *
  * PROJECT
- * icon...アイコンフォントです。
- * breadcrumb...パンくずリストです。
- * label...インラインのラベルです。
- * badge...投稿数のような数値を表示するバッジコンポーネントです。
+ * icon...アイコンフォントです。テンプレートから自動で生成されます。
+ * icon-extend...アイコンフォントを拡張するModifierです。
+ * label...インラインのラベルコンポーネントです。
+ * button...ボタンコンポーネントです。
  *
  * UTILITY
  * text...テキストのスタイルに関する汎用クラスです。
- * margin...マージンで余白の管理をします。常にした方向にだけ余白をとります。
+ * heading...見出しの汎用スタイルです。
+ * align...画像などを中央や右側に配置します。
  * display...要素の表示や改行をコントロールする場合に使用します。
+ * sr-only...要素を非表示にさせますが、スクリーンリーダーには読み上げられます。
  * width...おもにグリッドで使用する`width`を指定する汎用クラスです。
+ * margin...マージンで余白の管理をします。常に下方向にだけ余白をとります。
+ * section...`<section>`要素を使うようなセクションの余白を管理します。
+ *
+ * SCOPE
+ * blog...ブログページのスタイルです。
  */
 ```
 
-### モジュールタイトル
-スタイルや機能はモジュール化して分離しておきます。それぞれのモジュールには`#モジュール名`のように見出しをつけることで検索できるようにします。
-
-```scss
- /* #Grid
-   -------------------------------------------------------------------------- */
-```
-
 ### レイヤータイトル
-FLOCSSは6つのレイヤーをベースにしていますが、今どこのレイヤーにいるのか、どういった特徴のあるレイヤーなのかなどを残しておくと把握しやすくなります。
+どこのレイヤーにいるのか、どういった特徴のあるレイヤーなのかなどを残しておくとコードを理解しやすくなります。Small blockやMedium blockのような粒度の分類もコメントで残しておきます。
 
 ```scss
 /* -----------------------------------------------------------------------------
@@ -459,18 +472,57 @@ FLOCSSは6つのレイヤーをベースにしていますが、今どこのレ�
  * Componentレイヤーは多くのプロジェクトで横断的に再利用のできるような、小さな単位のモジュール（機能）です。
  * OOCSSの構造（structure）の機能を担うため、装飾的なスタイルをできるだけ含めないようにします。
  * また、`width`や`margin`といったレイアウトに影響を与えるプロパティもできるだけ含めないようにします。
- * 例えばbuttonのベーススタイルやgridやmediaといったレイアウトパターンが該当します。
  * プレフィックス（接頭辞）として`c-`をつけます。
  */
-@import "object/component/_wrapper";
-@import "object/component/_grid";
-@import "object/component/_media";
+// Small block
 @import "object/component/_list-unstyled";
-@import "object/component/_card";
-@import "object/component/_split";
-@import "object/component/_button";
-@import "object/component/_ratio";
+@import "object/component/_list-addstyle";
+@import "object/component/_list-ordered";
+@import "object/component/_list-note";
 @import "object/component/_embed";
+// Medium block
+@import "object/component/_list-inline";
+@import "object/component/_media";
+@import "object/component/_flag";
+@import "object/component/_table";
+@import "object/component/_ratio";
+// Large block
+@import "object/component/_layout";
+@import "object/component/_wrapper";
+```
+
+### モジュールタイトル
+モジュール化したファイルにはモジュールの名前や機能、マークアップの例などを残します。下記はスタイルガイドジェネレーター「[Aigis](https://pxgrid.github.io/aigis/)」のコメントも併記した例です（シンタックスハイライトを効かせるために一部全角を使用しています）。
+
+```scss
+ /* #Label
+   -------------------------------------------------------------------------- */
+/*
+ーーー
+name: label
+category: project
+ーーー
+
+インラインでメッセージを表示するコンポーネントです。
+
+｀｀｀jade
+p: span.p-label タグ名
+｀｀｀
+*/
+.p-label {
+  display: inline-block;
+  padding: 0.5em;
+  color: $_color-ui-bg;
+  font-size: $_font-size--small;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  text-decoration: none;
+  background-color: $_color-link;
+  @include _on-event() {
+    text-decoration: none;
+  }
+}
 ```
 
 ### コードの説明と参照リンク
@@ -493,58 +545,19 @@ html {
 ```
 
 ### 注意事項とTODO
-あとで処理をしたいことや、把握しておいてほしい注意事項はコメントに残して、いつでも検索できるようにします。
+あとで処理をしたいことや、把握しておいてほしい注意事項はコメントに残していつでも検索できるようにします。
 
-* `NOTE:` コード上で確認できない制限などの共有
-* `TBD:` 今後どうしていくか検討したいこと
-* `TODO:` 動作はするけれど改修したい箇所
-
-### マークアップ例
-再利用されるコンポーネントにはマークアップ例を書きます。スタイルガイドジェネレーターを使用する場合は、その記述方法で書いておきます（以下はHologramの場合）。
-
-```yaml
-/*doc
----
-title: grid
-name: grid
-categories: [component]
----
-
-グリッドレイアウトオブジェクトです。`width`の変更はUtilityレイヤーで指定します。
-
-Modifierは以下のとおりです。
-
-* ガターの追加 `--small`, `--medium`, `--large`
-* text-alignの変更 `--middle`, `--bottom`
-* 配置を反転 `--rev`
-
-｀｀｀block
-<div class="c-wrapper">
-  <div class="c-grid c-grid--medium">
-    <div class="c-grid__item u-8of12-md"></div>
-    <div class="c-grid__item u-4of12-md"></div>
-  </div>
-
-  <div class="c-grid c-grid--rev c-grid--medium">
-    <div class="c-grid__item u-8of12-md"></div>
-    <div class="c-grid__item u-4of12-md"></div>
-  </div>
-
-  <div class="c-grid c-grid--center c-grid--medium">
-    <div class="c-grid__item u-8of12-md"></div>
-  </div>
-</div>
-｀｀｀
-*/
-```
+- `NOTE:` コード上で確認できない制限などの共有
+- `TBD:` 今後どうしていくか検討したいこと
+- `TODO:` 動作はするけれど改修したい箇所
 
 ### Sassのコメント
 SassはCSSをプログラム的に拡張できるプリプロセッサーです。複雑になりがちな機能や使い方を伝えるためにコメントで補足をしておきます。
 
 ```scss
-// @desc - メディアクエリを挿入します。
-// @param {String} - 引数に変数のキーワードを渡します。
-// @see - foundation/variable/_breakpoint.scss
+// @desc - メディアクエリを`min-width`で挿入します。
+// @param {String} $breakpoint [$_default-breakpoint] - 引数に変数のキーワードを渡します。
+// @see - $_breakpoint-up
 // @example scss - Usage
 // .foo {
 //   color: red;
@@ -552,7 +565,6 @@ SassはCSSをプログラム的に拡張できるプリプロセッサーです�
 //     color: blue;
 //   }
 // }
-
 // @example css - CSS output
 // .foo {
 //   color: red;
@@ -562,11 +574,7 @@ SassはCSSをプログラム的に拡張できるプリプロセッサーです�
 //     color: blue;
 //   }
 // }
-
-// @desc - メディアクエリを`min-width`で挿入します。
-// @param {String} $breakpoint [md] - 引数に変数のキーワードを渡します。初期値は'md'です。
-// @see - $_breakpoint-up
-@mixin _mq-up($breakpoint: md) {
+@mixin _mq-up($breakpoint: $_default-breakpoint) {
   @if map-has-key($_breakpoint-up, $breakpoint) {
     @media #{inspect(map-get($_breakpoint-up, $breakpoint))} {
       @content;
@@ -579,7 +587,7 @@ SassはCSSをプログラム的に拡張できるプリプロセッサーです�
 ```
 
 ## フォーマットとプロパティの宣言順
-CSSの構文はセレクタとブレース、プロパティと値で構成されます。このルールセットに読みやすさを確保したフォーマット（書式）を定義します。
+CSSの構文はセレクタとブレース、プロパティと値で構成されます。このルールセットに読みやすさを確保したフォーマット（書式）をルール化します。
 
 ### ルールセットのフォーマット
 ルールセットの基本的なフォーマットは以下の通りです。
