@@ -73,7 +73,7 @@ Foundationレイヤーにはレイヤーを追加するため、normalize.cssや
 #### 2. Layout
 Layoutレイヤーはヘッダーやフッターのような、ページを構成するコンテナブロックのスタイルを定義します。目安としてはワイヤーフレームに書かれるような大きな単位のブロックです。汎用性のあるグリッドシステムは次のObject/Componentレイヤーで定義します。
 
-ヘッダーにあるロゴやグローバルナビゲーションのレイアウトの役割を持つことができます。グローバルナビゲーションやコピーライトのようなコンポーネントは、Object/Projectレイヤーで定義します。基本的にはclass属性を使用しますが、id属性を使用することもできます。
+例えば、ヘッダーにあるロゴやグローバルナビゲーションのレイアウトの役割を持つといったことができます。グローバルナビゲーションやコピーライトのようなコンポーネントは、Object/Projectレイヤーで定義します。基本的にはclass属性を使用しますが、id属性を使用することもできます。
 
 プレフィックス（接頭辞）として`l-`をつけます。
 
@@ -142,7 +142,7 @@ Utilityレイヤーはいわゆる汎用クラスで、ほとんどの場合は�
 ```
 
 ### 追加するレイヤー
-FLOCSSのファイル構成に4つのレイヤーを標準で追加します。
+FLOCSSのファイル構成に5つのレイヤーを標準で追加します。
 
 #### 1.1 Variable
 プロジェクト全体で使われる変数を定義します。例えば以下のように、基本的な変数を定義する`global.scss`とブレイクポイント、色、font-familyを定義するファイルを分割すると見通しがよくなります。
@@ -230,7 +230,7 @@ Layoutレイヤー以下のモジュールは機能ごとにファイルに分�
 Small Blockはリスト、ボタン、ラベルのような比較的小さく、内包されるBlockです。Medium Blockによって、スタイルが上書きされる可能性があります。
 
 ##### 2. Medium Block
-Medium BlockはSmall Blockを内包することができる、小さなレイアウトを担当するBlockです。例えば、`.media`や`button-group`のようなBlockです。
+Medium BlockはSmall Blockを内包することができる、小さなレイアウトを担当するBlockです。例えば、`.media`や`.button-group`のようなBlockです。
 
 Medium BlockはSmall Blockのスタイルを一部上書きすることができます。
 
@@ -393,6 +393,53 @@ Sassの入れ子とアンパサンド（`&`）でBEMの記述を短縮するこ�
 早く書けることも必要ですが、修正や運用がしやすいことのほうがずっと重要です。
 
 その他のBEMに関する注意点などは[BEM(MindBEMding)によるCSS設計](https://github.com/manabuyasuda/styleguide/blob/master/how-to-bem.md)を参照してください。
+
+### プレフィックス（Prefix）
+レイヤーごとの役割を示したり、名前の重複をさせないために名前空間としてプレフィックスをつけます。FLOCSSで推奨されているプレフィックスといくつかのプレフィックスを使用します。
+
+- `l-` Layoutレイヤー
+- `c-` Componentレイヤー
+- `p-` Projectレイヤー
+- `u-` Utilityレイヤー
+- `t-` Themeレイアー
+- `s-` Scopeレイヤー
+- `qa-`, `te-` QA/Testレイヤー
+- `is-` クリックやマウスオーバーなどのイベントが発生している要素に付与する
+- `js-` JavaScriptから参照される要素
+- `cp-` あるHTML専用のCSSファイル（current pageの略称。名前を変更することもできます。）
+
+### サフィックス（Suffix）
+ブレイクポイントを指定しているクラス名は`-sm`や`-md`のようなブレイクポイントのキーワードをクラス名の末尾につけます。  
+ブレイクポイントはグローバル変数として定義しておき、そのキーをクラス名にも使うようにします。
+
+```scss
+$_breakpoint-up: (
+  'sm': 'screen and (min-width: 400px)',
+  'md': 'screen and (min-width: 768px)',
+  'lg': 'screen and (min-width: 1000px)',
+  'xl': 'screen and (min-width: 1200px)',
+) !default;
+```
+
+```scss
+@media (min-width: 400px) {
+  .u-dn-sm { display: none; }
+}
+
+@media (min-width: 768px) {
+  .u-dn-md { display: none; }
+}
+
+@media (min-width: 1000px) {
+  .u-dn-lg { display: none; }
+}
+
+@media (min-width: 1200px) {
+  .u-dn-xl { display: none; }
+}
+```
+
+メディアクエリは`min-width`を優先的に使い`-sm`などとします。`max-width`のパターンも作る場合は`-sm-down`などとします。
 
 ## コメント
 コメントにはコードだけでは理解できない（しにくい）情報を残します。例えば以下のようなものです。
