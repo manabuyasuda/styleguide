@@ -13,15 +13,12 @@ root
         │   ├── mixin/
         │   └── variable/
         ├── layout/
-        ├── object/
-        │   ├── component/
-        │   ├── project/
-        │   └── utility/
-        └── scope/
+        └── object/
+        　   ├── component/
+        　   ├── project/
+        　   ├── scope/
+        　   └── utility/
 ```
-
-Scopeレイヤーは（ページ内の小さな範囲からページ単位までの）ある範囲をスコープとして、Scopeレイヤーより先に読み込まれたスタイルの上書きや、スコープ特有のスタイルを指定するためのレイヤーです。  
-その他の追加しているレイヤーに関しては後述します。
 
 スタイルは基本的に`/assets/css/common.scss`で出力しますが、ページ特有のスタイルが多く出る場合は`css/pagename.scss`のようにページ専用のスタイルシートを作ることもできます。
 
@@ -36,11 +33,11 @@ root
 │       │   ├── mixin/
 │       │   └── variable/
 │       ├── layout/
-│       ├── object/
-│       │   ├── component/
-│       │   ├── project/
-│       │   └── utility/
-│       └── scope/
+│       └── object/
+│        　  ├── component/
+│        　  ├── project/
+│        　  ├── scope/
+│        　  └── utility/
 ├── css/
 │   └── index.scss
 ├── index.html
@@ -120,7 +117,7 @@ Projectレイヤーはプロジェクト固有のパターンで、複数のペ�
 @import "object/project/_button";
 ```
 
-#### 3.3 Utility
+#### 3.4 Utility
 Utilityレイヤーはいわゆる汎用クラスで、ほとんどの場合は単一のスタイルをもっています。コンポーネント間の間隔を調整したり、BEMのModifierが増えすぎるのを防ぎます。
 
 見出しやセクションごとの余白などは共通の構造を持っていないことが多く、BEMのBlockとModifierで拡張することが適切でない場合があります。  
@@ -190,8 +187,8 @@ normalize.cssや要素セレクタ・属性セレクタのデフォルトスタ�
 @import "foundation/base/_base";
 ```
 
-#### 4. Scope
-ComponentレイヤーやProjectレイヤーのようなコンポーネント単位ではなく、ページ単位や任意の範囲（スコープ）でのスタイルを定義します。1箇所でしか使わないような特異なスタイルや、ページ単位でComponentやProjectレイヤーのスタイルを微調整したい場合に使用してもかまいません。
+#### 3.3 Scope
+ComponentレイヤーやProjectレイヤーのようなコンポーネント単位ではなく、ページ内の小さな範囲（スコープ）でのスタイルを定義します。繰り返し使用しないページ特有のスタイルはPageレイヤーやHTMLファイルのある各ディレクトリに定義します。
 
 例えばブログページのスタイルとして_blog.scssを作成します。このレイヤーでは`.s-blog p`のような要素セレクタとの結合子も使うこともできます。  
 もし、このレイヤーで同じパターンが3箇所で使われていたら、ProjectレイヤーやUtilityレイヤーでまとめられないか検討しましょう。
@@ -199,12 +196,13 @@ ComponentレイヤーやProjectレイヤーのようなコンポーネント単�
 プレフィックス（接頭辞）として`s-`をつけます。
 
 ```scss
-@import "scope/_blog";
+@import "object/scope/_blog";
 ```
 
 #### その他のレイヤー
 その他にもレイヤーを追加することもできます。
 
+- Page - ページ特有のスタイルやページ単位でObjectレイヤー内のスタイルを上書きする場合など
 - Theme - SMACSSのThemeモジュールに該当するテーマによる色の切り替えなど
 - QA/Test - Quality Assurance（品質保証）、もしくはテストのための一次的なスタイル
 
@@ -253,8 +251,9 @@ Large BlockはSmall BlockとMedium Blockを内包することができますが�
 @import "layout/";
 @import "object/component/";
 @import "object/project/";
+@import "object/scope/";
 @import "object/utility/";
-@import "scope/";
+@import "page/";
 @import "theme/";
 @import "qa/";
 ```
