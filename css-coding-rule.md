@@ -115,13 +115,15 @@ Projectレイヤーはプロジェクト固有のパターンで、複数のペ�
 @import "object/project/_icon-extend";
 @import "object/project/_label";
 @import "object/project/_button";
+@import "object/project/_heading-h2";
+@import "object/project/_heading-h3";
 ```
 
 #### 3.4 Utility
 Utilityレイヤーはいわゆる汎用クラスで、ほとんどの場合は単一のスタイルをもっています。コンポーネント間の間隔を調整したり、BEMのModifierが増えすぎるのを防ぎます。
 
-見出しやセクションごとの余白などは共通の構造を持っていないことが多く、BEMのBlockとModifierで拡張することが適切でない場合があります。  
-そのようなモジュールは無理にBEMにせず、`.u-heading`や`.u-section`などをプレフィックスとした汎用クラスを作ります。
+共通の構造を持っていないセクションごとの余白などは、BEMのBlockとModifierで拡張することが適切でない場合があります。  
+そのようなモジュールは無理にBEMにせず、`.u-section`のようプレフィックスつけた汎用クラスを作ります。
 
 `.mb10`のような具体的な名前より`.mb-small`のような相対的な名前にしたり、pxよりもemや%で指定することを推奨します。確実にスタイルを適応させるために`!important`を使用します。
 
@@ -129,7 +131,6 @@ Utilityレイヤーはいわゆる汎用クラスで、ほとんどの場合は�
 
 ```scss
 @import "object/utility/_text";
-@import "object/utility/_heading";
 @import "object/utility/_align";
 @import "object/utility/_display";
 @import "object/utility/_sr-only";
@@ -193,9 +194,13 @@ ComponentレイヤーやProjectレイヤーのようなコンポーネント単�
 例えばブログページのスタイルとして_blog.scssを作成します。このレイヤーでは`.s-blog p`のような要素セレクタとの結合子も使うこともできます。  
 もし、このレイヤーで同じパターンが3箇所で使われていたら、ProjectレイヤーやUtilityレイヤーでまとめられないか検討しましょう。
 
+直下の要素に一律の余白を指定するといった使い方をしてもいいでしょう。
+
 プレフィックス（接頭辞）として`s-`をつけます。
 
 ```scss
+@import "object/scope/_element";
+@import "object/scope/_block";
 @import "object/scope/_blog";
 ```
 
