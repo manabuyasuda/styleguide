@@ -122,7 +122,7 @@ Projectレイヤーはプロジェクト固有のパターンで、複数のペ�
 #### 3.4 Utility
 Utilityレイヤーはいわゆる汎用クラスで、ほとんどの場合は単一のスタイルをもっています。コンポーネント間の間隔を調整したり、BEMのModifierが増えすぎるのを防ぎます。
 
-共通の構造を持っていないセクションごとの余白などは、BEMのBlockとModifierで拡張することが適切でない場合があります。  
+共通の構造を持っていないセクションごとの余白などは、BEMのBlockとModifierで拡張することが適切でない場合があります。
 そのようなモジュールは無理にBEMにせず、`.u-section`のようプレフィックスつけた汎用クラスを作ります。
 
 `.mb10`のような具体的な名前より`.mb-small`のような相対的な名前にしたり、pxよりもemや%で指定することを推奨します。確実にスタイルを適応させるために`!important`を使用します。
@@ -160,7 +160,7 @@ Sass（scss記法）で変数を定義する場合は以下のことに気をつ
 - 3箇所以上で使われる共通の値やプロジェクトに関わらず利用できる値だけを定義します。
 
 #### 1.2 Function
-Sassで使用できるfunctionを機能ごとに定義します。例えばpxをremに変換したり、PhotoShopのトラッキングをemに変換するfunctionなどです。  
+Sassで使用できるfunctionを機能ごとに定義します。例えばpxをremに変換したり、PhotoShopのトラッキングをemに変換するfunctionなどです。
 `$pn-`(Project name)のようにプレフィックスを付けることで名前の衝突を防ぎます。
 
 ```scss
@@ -170,7 +170,7 @@ Sassで使用できるfunctionを機能ごとに定義します。例えばpxを
 ```
 
 #### 1.3 Mixin
-Sassで使用できるmixinを機能ごとに定義します。例えばメディアクエリやclearfix、再利用できるオブジェクトのベーススタイルなどです。  
+Sassで使用できるmixinを機能ごとに定義します。例えばメディアクエリやclearfix、再利用できるオブジェクトのベーススタイルなどです。
 `$pn-`(Project name)のようにプレフィックスを付けることで名前の衝突を防ぎます。
 
 ```scss
@@ -191,10 +191,29 @@ normalize.cssや要素セレクタ・属性セレクタのデフォルトスタ�
 #### 3.3 Scope
 ComponentレイヤーやProjectレイヤーのようなコンポーネント単位ではなく、ページ内の小さな範囲（スコープ）でのスタイルを定義します。繰り返し使用しないページ特有のスタイルはPageレイヤーやHTMLファイルのある各ディレクトリに定義します。
 
-例えばブログページのスタイルとして_blog.scssを作成します。このレイヤーでは`.s-blog p`のような要素セレクタとの結合子も使うこともできます。  
+例えばブログページのスタイルとして_blog.scssを作成します。このレイヤーでは`.s-blog p`のような要素セレクタとの結合子も使うこともできます。
 もし、このレイヤーで同じパターンが3箇所で使われていたら、ProjectレイヤーやUtilityレイヤーでまとめられないか検討しましょう。
 
 直下の要素に一律の余白を指定するといった使い方をしてもいいでしょう。
+
+```scss
+.s-block {
+  > {
+    section, address,
+    // h1, h2, h3, h4, h5, h6,
+    p, ul, ol, dl,
+    pre, div,
+    blockquote, figure,
+    table,
+    form,
+    a {
+      &:not(:last-child) {
+        margin-bottom: 1.7rem;
+      }
+    }
+  }
+}
+```
 
 プレフィックス（接頭辞）として`s-`をつけます。
 
@@ -225,20 +244,18 @@ Layoutレイヤー以下のモジュールは機能ごとにファイルに分�
 #### モジュールの粒度
 モジュールを適切な粒度（受け持つ機能の大きさ）にするために、以下の3つの粒度でモジュールを分類し、小さなモジュールから読み込みます。
 
-1. Small Block
-1. Medium Block
-1. Large Block
+1. Content
+1. Medium Container
+1. Large Container
 
-##### 1. Small Block
-Small Blockはリスト、ボタン、ラベルのような比較的小さく、内包されるBlockです。Medium Blockによって、スタイルが上書きされる可能性があります。
+##### 1. Content
+見出しやリスト、ボタンやアイコンなどのページの内容を表現する小さなオブジェクトです。
 
-##### 2. Medium Block
-Medium BlockはSmall Blockを内包することができる、小さなレイアウトを担当するBlockです。例えば、`.media`や`.button-group`のようなBlockです。
+##### 2. Medium Container
+Contentを内包するオブジェクトで、Contentのスタイルを上書きすることができます。例えば、`.media`や`.button-group`のようなオブジェクトです。
 
-Medium BlockはSmall Blockのスタイルを一部上書きすることができます。
-
-##### 3. Large Block
-Large BlockはSmall BlockやMedium Blockを内包することができる、大きなレイアウトを担当するBlockです。例えば、`.grid`や`.wrapper`のようなBlockです。
+##### 3. Large Container
+ContentやMedium Containerを内包するオブジェクトで、内包するオブジェクトに干渉することはできません。例えば、`.grid`や`.wrapper`のようなオブジェクトです。
 
 Large BlockはSmall BlockとMedium Blockを内包することができますが、スタイルを上書きすることはできません。
 
@@ -264,8 +281,8 @@ Large BlockはSmall BlockとMedium Blockを内包することができますが�
 ```
 
 #### 外部ライブラリのレイヤー
-JQueryのプラグイン、CSSフレームワークやライブラリを読み込ませる順序は「レイヤーの順序」で示した基準を使います。外部ライブラリであっても、役割や機能が変わることはないからです。  
-例えば、normalize.cssは`foundation/base/`、スライダーのようなJQueryプラグインは`object/project/`のMedium Blockが適切な位置になるでしょう。
+JQueryのプラグイン、CSSフレームワークやライブラリを読み込ませる順序は「レイヤーの順序」で示した基準を使います。外部ライブラリであっても、役割や機能が変わることはないからです。
+例えば、normalize.cssは`foundation/base/`、スライダーのようなJQueryプラグインは`object/project/`のMedium Containerが適切な位置になるでしょう。
 
 外部ライブラリは基本的にファイルを直接上書きせず、`libraryname-extend.scss`のようなファイルを作成し、上書きをします。
 
@@ -318,7 +335,7 @@ Elementを入れ子にするときに`.block__element__element`のような名�
 OOCSSのようにマルチクラスで指定するのを基本とします。基本的にはBlockは独立して機能するようにしますが、汎用性を考慮したり、クラス名が長くなりすぎる場合には、Modifierだけでなく汎用クラスを組み合わせることもあります。
 
 ```html
-<!-- 汎用クラスで`width`を指定している。 --> 
+<!-- 汎用クラスで`width`を指定している。 -->
 <div class="c-grid">
   <div class="c-grid__item u-8of12-md"></div>
   <div class="c-grid__item u-4of12-md"></div>
@@ -413,7 +430,7 @@ Sassの入れ子とアンパサンド（`&`）でBEMの記述を短縮するこ�
 - `cp-` あるHTML専用のCSSファイル（current pageの略称。名前を変更することもできます。）
 
 ### サフィックス（Suffix）
-ブレイクポイントを指定しているクラス名は`-sm`や`-md`のようなブレイクポイントのキーワードをクラス名の末尾につけます。  
+ブレイクポイントを指定しているクラス名は`-sm`や`-md`のようなブレイクポイントのキーワードをクラス名の末尾につけます。
 ブレイクポイントはグローバル変数として定義しておき、そのキーをクラス名にも使うようにします。
 
 ```scss
@@ -504,6 +521,13 @@ $_breakpoint-up: (
  * icon-extend...アイコンフォントを拡張するModifierです。
  * label...インラインのラベルコンポーネントです。
  * button...ボタンコンポーネントです。
+ * heading-h2...`<h2>`で使うような見出しです。
+ * heading-h3...`<h3>`で使うような見出しです。
+ *
+ * SCOPE
+ * element...BEMにおけるElementの余白を一括で指定します。
+ * block...BEMにおけるBloclの余白を一括で指定します。
+ * blog...ブログページのスタイルです。
  *
  * UTILITY
  * text...テキストのスタイルに関する汎用クラスです。
@@ -514,14 +538,11 @@ $_breakpoint-up: (
  * width...おもにグリッドで使用する`width`を指定する汎用クラスです。
  * margin...マージンで余白の管理をします。常に下方向にだけ余白をとります。
  * section...`<section>`要素を使うようなセクションの余白を管理します。
- *
- * SCOPE
- * blog...ブログページのスタイルです。
  */
 ```
 
 ### レイヤータイトル
-どこのレイヤーにいるのか、どういった特徴のあるレイヤーなのかなどを残しておくとコードを理解しやすくなります。Small blockやMedium blockのような粒度の分類もコメントで残しておきます。
+どこのレイヤーにいるのか、どういった特徴のあるレイヤーなのかなどを残しておくとコードを理解しやすくなります。ContentやMedium Containerのような粒度の分類もコメントで残しておきます。
 
 ```scss
 /* -----------------------------------------------------------------------------
@@ -533,19 +554,20 @@ $_breakpoint-up: (
  * また、`width`や`margin`といったレイアウトに影響を与えるプロパティもできるだけ含めないようにします。
  * プレフィックス（接頭辞）として`c-`をつけます。
  */
-// Small block
+// Content
 @import "object/component/_list-unstyled";
 @import "object/component/_list-addstyle";
 @import "object/component/_list-ordered";
 @import "object/component/_list-note";
 @import "object/component/_embed";
-// Medium block
+// Medium Container
+@import "object/component/_block";
 @import "object/component/_list-inline";
 @import "object/component/_media";
 @import "object/component/_flag";
 @import "object/component/_table";
 @import "object/component/_ratio";
-// Large block
+// Large Container
 @import "object/component/_layout";
 @import "object/component/_wrapper";
 ```
@@ -579,6 +601,7 @@ p: span.p-label タグ名
   text-decoration: none;
   background-color: $_color-link;
   @include _on-event() {
+    color: #fff;
     text-decoration: none;
   }
 }
@@ -1150,7 +1173,7 @@ font-sizeやmarginなどのショートハンドプロパティの使用は必�
 
 ```scss
 // Good
-.foo { 
+.foo {
   // 中央配置にする。
   margin-right: auto;
   margin-left: auto;
