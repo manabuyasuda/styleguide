@@ -9,12 +9,12 @@ OOCSSのようなオブジェクト指向のCSSアプローチは再利用性や
 ECSSでは複雑で抽象度の高いオブジェクト指向ではなく、複雑さをなくして、管理をしやすく、CSSの寿命を長くすることを目指したアプローチをとります（イメージとしては100を70にするのではなく、100は100のままで管理をする。大きな塔ではなく中規模のビル群を作っていく。）。  
 OOCSSが[DRY](https://www.google.co.jp/search?q=Don%27t+repeat+yourself&gws_rd=cr&ei=BkiRWOqJF8uh8QXZzrOAAg)（Don't repeat yourself：繰り返しを避けること）を目指しているのとは対照的に、ECSSでは繰り返しを許容し、適切に分離（decoupling）することを目指します。
 
-ECSSは（例えば、ファイルサイズ、UIの数、開発者の数などが）大規模なWebアプリケーションのCSSを合理的に書くためアプローチです。すべてのケースには当てはまらないので、[Atomic Design](http://atomicdesign.bradfrost.com/)や[OOCSS](https://github.com/stubbornella/oocss)、[SMACSS](https://smacss.com/ja)や[BEM](https://en.bem.info/)のようなアプローチも検討してください。
+ECSSは（例えば、ファイルサイズ、UIの数、開発者の数などが）大規模なWebアプリケーションのCSSを合理的に書くためアプローチです。すべてのケースには当てはまらないので、[Atomic Design](http://atomicdesign.bradfrost.com/)や[OOCSS](https://github.com/stubbornella/oocss)、[SMACSS](https://smacss.com/ja)や[BEM](https://en.bem.info/)、[CSS Modules](https://github.com/css-modules/css-modules)のようにCSSのスコープを管理できるツールなどのアプローチも検討してください。
 
 ## ECSSの用語の定義
 同じ言葉でも違った意味で解釈されてしまうことがあります。これを避けるためにECSSで使用される言葉とその意味を定義します。
 
-- キーセレクタ：任意のCSSルールの右端の実際にスタイルが適応されるセレクタ
+- キーセレクタ：セレクタの右端にある実際にスタイルが適応されるセレクタ
 - 上書き（オーバーライド）：キーセレクタの値が継承に基づいて意図的に修正される状況
 - 接頭辞：ベンダープレフィックス。 例：`-webkit-transform`
 - オーサリングスタイルシート：スタイリングルールを作成するファイル（PostCSSやSassなど）
@@ -22,10 +22,18 @@ ECSSは（例えば、ファイルサイズ、UIの数、開発者の数など�
 - コンテキスト：前後の文脈や状況
 - スコープ：有効になる範囲を限定すること
 
+## ECSSが目標とすること
+ECSSは主に、CSSのシンタックスにあるブレース（`{}`）の外側をどのように扱うのかに主眼をおいています。そして、プロパティというブレースの内側のDRYではなく、キーセレクタこそが本当にDRYにすべきものだとしています。
+そのため、変数や最低限のmixinなどで共通化はするものの、ブレースの内側をDRYにすることには「見て見ぬ振り」をすることが大切だとも言っています。
+
+キーセレクタのDRYとは、コンテキストが違うものは既存のコンポーネントと似ていても新しくコンポーネントを作るということ、既存のコンポーネントを抽象化したり拡張しないということです。そして、管理上キーセレクタは1つのブレースの中で完結している（DRYである）必要があるとしています。
+
+抽象化したモジュールは変更に対する影響範囲が必然的に大きく、扱いづらくなってしまいます。キーセレクタをDRYにすることによって、多少冗長であっても変更しやすく削除しやすいモジュールにすることが、大規模なプロジェクトを長期間にわたって管理し続けるために大切なことだとしています。
+
 ## モジュールと命名規則
 他のCSSの手法と同じく、ECSSも特定のスコープでUIを分割します。
 
-- namespace（名前空間） - 名前の衝突を防ぐためのコンテキストに合わせた接頭辞
+- namespace（名前空間） - 名前の衝突を防ぐための接頭辞で、コンテキストやモジュールをあらわす
 - Module（モジュール） - 視覚的に認識できる個別の機能領域のもっとも大きな区分
 - Component（コンポーネント） - Moduleに含まれる機能性を持つ部品
 - ChildNode（子ノード） - Componentを構成する独立した部品
@@ -33,9 +41,17 @@ ECSSは（例えば、ファイルサイズ、UIの数、開発者の数など�
 
 これはBEMの命名規則と似ています。
 
-- ModuleとComponent - Block
-- ChildNode - Element
-- variant - Modifier
+- ModuleとComponentはBlock
+- ChildNodeはElement
+- variantはModifier
+
+BEMのBlockとECSSのModuleの違いは粒度の考え方です。BlockはModifierによってバリエーションを追加することができますが、Blockの上位にあるDOMにクラスが追加された場合はどう解釈すればいいでしょうか？ECSSでは上位のDOMをModule、内包される要素をComponentのように考えます。  
+ECSSはBEMよりも粒度を大きくすることで、様々なケースに対応できるように考えられています。
+
+ECSSのModuleとComponentの考え方はAtomic DesignのOrganismsとModuleの考え方に似ているとも言えます。
+
+- ModuleはOrganisms
+- ComponentはModule
 
 ### 命名規則
 モジュールは以下のようなシンタックスで表現されます。
@@ -61,7 +77,7 @@ namespace-ComponentName_ChildNode-variant
 
 ECSSのComponentはModuleの中にある、一定以上の大きさや機能をもったUIのことを指します。例えば、以下のようなものが考えられます。
 
-- ヘッダー内のロゴやナビゲーション、検索フォーム（`.st-Logo`, `.st-Nav`, `.st-Search`）
+- ヘッダーやフッターのような共通部分（SiteWide）のロゴやナビゲーション、検索フォーム（`.st-Logo`, `.st-Nav`, `.st-Search`）
 - トップページ内のaboutエリア、商品リスト、関連リンク（`.tp-About`, `.tp-ProductList`, `.tp-RelatedLink`）
 - `hero`名前空間に属したスタンダートなメインビジュアル（`.hero-Standard`）
 - `doc`名前空間に属したドキュメンテーションエリア（`.doc-Main`）
@@ -79,7 +95,16 @@ ECSSのComponentはModuleの中にある、一定以上の大きさや機能を�
 省略は必須ではないので、`.home-`のようにしてもいいでしょう。  
 また、省略したときに名前が重複しないように、特にコンテキストの数の多い案件では注意が必要かもしれません。
 
-名前空間は`.hero-`や`.doc-`といったモジュールのような名前になることもあります。これは比較的シンプルでバリエーションを想定していない場合だと考えられるので、`.hero-Title`ではなく`.hero-Standard_Title`のようにChildNodeとしてスコープを作ると重複を避けることができます。もしくは、`.tp-Hero`のようにトップページの`Hero`モジュールという意味合いを持たせてもいいでしょう。
+名前空間は`.hero-`や`.doc-`といったモジュールをあらわすこともあります。
+
+```css
+/* `hero`名前空間を持つComponent */
+.hero-Standard {}
+.hero-Title {}
+.hero-Strap {}
+```
+
+上記の例は比較的シンプルなコンポーネントで、バリエーションを想定していない場合だと考えられるので、`.hero-Title`ではなく`.hero-Standard_Title`のようにChildNodeとしてスコープを作ると重複をより避けることができます。もしくは、`.tp-Hero`のようにトップページの`Hero`コンポーネントという意味合いを持たせてもいいでしょう。
 
 ```css
 /* `hero`名前空間を持つComponent */
@@ -98,6 +123,8 @@ ECSSのComponentはModuleの中にある、一定以上の大きさや機能を�
 .tp-Hero_Strap {}
 ```
 
+いずれの場合も、名前空間というスコープを作ることでModuleやComponentなどの名前をつけやすくすることができます。
+
 #### 共通の構造的なModule
 ヘッダーやフッターのようなサイト共通で使われる構造的なModuleは名前空間に「Structure」という意味の`.st-`を使うといいでしょう。
 
@@ -107,20 +134,20 @@ ECSSのComponentはModuleの中にある、一定以上の大きさや機能を�
 #### 改修・バージョン管理
 ECSSではModuleは（例えばトップページやカテゴリートップページのような）特定のコンテキストを持っています。
 
-例えばトップページの改修があったとしても、`.tp-`（TopPage）という名前空間を持ったModuleのアセットが不要になるのは分かるので、迷わず削除することができます。改修後のModuleは同じ`.tp-`名前空間を使ってもいいですし、`.tp2-`（TopPage2）という名前空間に変更してもいいでしょう。
+例えばトップページの改修があったとき、`.tp-`（TopPage）という名前空間を持ったModuleのアセットが不要になるのは分かるので、迷わず削除することができます。改修後のModuleは同じ`.tp-`名前空間を使ってもいいですし、`.tp2-`（TopPage2）という名前空間に変更してもいいでしょう。
 
 ### サイト共通の汎用的なModule
 
-サイト内で使われる汎用的なModuleは名前空間に「SiteWide」という意味の`.sw-`を使うといいでしょう。例えばボタンやリストのような小さなコンポーネントです。
+サイト内で使われる汎用的なModuleは名前空間に「SiteWide」という意味の`.sw-`を使うといいでしょう。例えばボタンやリストのようなモジュールです。
 
 - サイト共通のボタン → `.sw-Button`
 - サイト共通の順序つきリスト → `.sw-OrderedList`
 
-ただし、ECSSでは汎用的なModuleは極力もつべきでないとされています。
+ただし、ECSSでは汎用的なModuleは極力もつべきでないとされているため、メリットとデメリットをよく見定める必要があります。
 
 汎用的なModuleを作るメリットは
 
-- デザインの再利用ができる（工数の削減）
+- デザインの再利用ができる（工数の削減、よく似ているデザインを防ぐ）
 - 小さなModuleごとにテストができる
 - 同じルールセットを減らすことができる
 
@@ -132,21 +159,107 @@ ECSSではModuleは（例えばトップページやカテゴリートップペ�
 サイト共通として見た目が同じであることと、実装として同じコードであることは違います。例外を含んでいないか、サイト共通のコードとして実装してもいいのかを合意形成してから共通化する必要があります。
 
 ## ディレクトリ構造
-ECSSではサイト全体で使えるコンポーネントを作って組み合わせることは基本的に考えません。ページやカテゴリーのようなスコープでコンポーネントを作って、CSS・JS・画像をスコープごとにまとめて管理します。
+ECSSではコンテキストをスコープとしてファイルを管理します。スコープごとに必要なものを分割することで、見つけやすく、削除しやすくします。スコープごとにまとめられたフォルダをアセットと呼びます。
+
+例えば、以下のようなファイル構成が考えられます（WebサイトではHTMLファイルをアセットに含めるのは難しいので別で管理をする想定です）。ベースになるCSSはglobalCSS以下にあり、それ以外のモジュールはnamespace以下にあります。
 
 ```
-/assets/
-  /TopPage
-    /css
-    /js
-    /img
-  /CategoryTop
-    /css
-    /js
-    /img
+src
+├── globalCSS
+│   ├── base.css
+│   ├── tool.css
+│   └── variable.css
+├── namespace
+│   ├── CategoryTop
+│   │   ├── Module1
+│   │   │   ├── Module1.css
+│   │   │   ├── Module1.js
+│   │   │   └── img
+│   │   └── Module2
+│   │       ├── Module2.css
+│   │       ├── Module2.js
+│   │       └── img
+│   ├── SiteWide
+│   │   ├── Module1
+│   │   │   ├── Module1.css
+│   │   │   ├── Module1.js
+│   │   │   └── img
+│   │   └── Module2
+│   │       ├── Module2.css
+│   │       ├── Module2.js
+│   │       └── img
+│   ├── Structure
+│   │   ├── Module1
+│   │   │   ├── Module1.css
+│   │   │   ├── Module1.js
+│   │   │   └── img
+│   │   └── Module2
+│   │       ├── Module2.css
+│   │       ├── Module2.js
+│   │       └── img
+│   └── TopPage
+│       ├── Module1
+│       │   ├── Module1.css
+│       │   ├── Module1.js
+│       │   └── img
+│       └── Module2
+│           ├── Module2.css
+│           ├── Module2.js
+│           └── img
+└── style.css
 ```
 
-スコープごとに必要なものを分けることで、見つけやすく、削除しやすくします。スコープごとにまとめられたフォルダをアセットと呼びます。
+ディレクトリは以下のようなクラス名になります。
+
+- /src/namespace/Structure/Module1：`.st-Module1`
+- /src/namespace/SiteWide/Module1：`.sw-Module1`
+- /src/namespace/TopPage/Module1：`.tp-Module1`
+- /src/namespace/CategoryTop/Module1：`.ct-Module1`
+
+
+例えば、`.st-Module1`の中には以下のようなクラス名が含まれることになります（逆に`.st-Module2`は含まれません）。
+
+- `.st-Module1`
+- `.st-Module1_ChildNode`
+- `.st-Module1-variant`
+
+CSSファイルはglobパターンを使って一括でインポートします。[ecss-postcss-shell](https://github.com/benfrain/ecss-postcss-shell/blob/master/gulpfile.js)では[postcss-import](https://github.com/postcss/postcss-import)を使った例が紹介されています。
+
+```js
+// Create the styles
+gulp.task("styles", ["lint-styles"], function () {
+    var processors = [
+        postcssImport({glob: true}),
+        mixins,
+        simpleVars,
+        colorFunction(),
+        nested,
+        autoprefixer({ browsers: ["last 2 version", "safari 5", "opera 12.1", "ios 6", "android 2.3"] }),
+        cssnano
+    ];
+    return gulp.src("preCSS/styles.css")
+    // start Sourcemaps
+    .pipe(sourcemaps.init())
+    // We always want PostCSS to run
+    .pipe(postcss(processors).on("error", gutil.log))
+    // Write a source map into the CSS at this point
+    .pipe(sourcemaps.write())
+    // Set the destination for the CSS file
+    .pipe(gulp.dest("./build"))
+    // If in DEV environment, notify user that styles have been compiled
+    .pipe(notify("Yo Mofo, check dem styles!!!")); 
+});
+```
+
+style.cssには以下のようにしてインポートします。
+
+```scss
+@import "globalCSS/variable.css";
+@import "globalCSS/tool.css";
+@import "../../node_modules/normalize.css/normalize.css";
+@import "globalCSS/base.css";
+@import "namespace/**/*.css";
+```
 
 ## 状態変化
 Moduleの状態変化は[WAI-ARIA](https://github.com/momdo/momdo.github.io/wiki#aria%E9%96%A2%E9%80%A3)を使うことが推奨されています。
@@ -158,6 +271,38 @@ Moduleの状態変化は[WAI-ARIA](https://github.com/momdo/momdo.github.io/wiki
 | aria-busy       | trueで読込中、falseで通常を示す       |
 | aria-expanded   | trueで展開、falseで格納を示す         |
 | aria-hidden     | trueで非表示、falseで表示状態を示す   |
+
+`.is-active`のようなクラスを追加するよりも名前のバラつきが起こりにくいことや、標準化された支援技術によってアクセシブルになることが期待できます。
+
+WAI-ARIAを使わない場合は`.is-`のような名前空間でなく、variantを使うことを勧めています。
+
+```html
+<!-- Allow -->
+<button class="co-Button is-Selected">Old Skool Button</button>
+
+<!-- Good -->
+<button class="co-Button co-Button-selected">Old Skool Button</button>
+```
+
+## CMSから生成されたコンテンツ
+CMSでコンテンツを作成するときに、すべての要素にクラスを指定することが難しいことがあります。そういった場合には無理にクラスを指定せずに、モジュール内の要素セレクタに対してスタイルを指定することも許容されています。
+
+```css
+.st-Main {
+  h1 {
+    /* Styles for h1 */
+  }
+  p {
+    /* Styles for p */
+  }
+  ul {
+    /* Styles for ul */
+  }
+  li {
+    /* Styles for li */
+  }
+}
+```
 
 ## ツール
 ECSSではCSSプリプロセッサとLintの使用を推奨しています。どのCSSプリプロセッサやタスクランナーを使うのかといったことは、プロジェクトの要件によっても違いますし、時期によっても最適なものは違います（ECSS本ではPostCSSとGulp、Stylelintを使用）。必要な機能は以下の通りです。
@@ -174,7 +319,7 @@ ECSSではCSSプリプロセッサとLintの使用を推奨しています。ど
 ### Stylelint
 PostCSSではStylelintを使います。`.stylelintrc`には以下のように設定します。
 
-```
+```js
 // Config for linting
 module.exports = { 
     "rules": {
@@ -216,16 +361,16 @@ module.exports = {
 
 
 ## 健全なスタイルシートの十戒
-- すべてのキーセレクタは"Single Source of truth"であること
-- 入れ子にしてはいけない（メディアクエリ、上書き、本当に必要であると感じない限りは）
-- IDセレクタを使用しない（必要だと感じていても）
-- オーサリングスタイルシートにベンダープレフィックスを書いてはいけない
-- サイズや色、z-indexに変数を使用する
-- モバイルファーストで書く（max-widthを避ける）
-- mixinを控えめに使用する（extendを避ける）
-- すべてのマジックナンバーとブラウザハックに対してコメントを書く
-- インラインイメージを使わない
-- 複雑なCSSを書かず、同じように動くシンプルなCSSを書きます
+1. すべてのキーセレクタは"Single Source of truth"であること
+2. 入れ子にしてはいけない（メディアクエリ、上書き、本当に必要であると感じない限りは）
+3. IDセレクタを使用しない（必要だと感じていても）
+4. オーサリングスタイルシートにベンダープレフィックスを書いてはいけない
+5. サイズや色、z-indexに変数を使用する
+6. モバイルファーストで書く（max-widthを避ける）
+7. mixinを控えめに使用する（extendを避ける）
+8. すべてのマジックナンバーとブラウザハックに対してコメントを書く
+9. インラインイメージを使わない
+10. 複雑なCSSを書かず、同じように動くシンプルなCSSを書きます
 
 ### 1. すべてのキーセレクタは"Single Source of truth"であること
 キーセレクタ（実際にスタイルが適応されるセレクタ）に対するスタイルの指定は1つの`{}`内で完結するようにします。これは重複をなくし管理しやすくするためと、アセットを削除しやすくするのと同じようにキーセレクタも削除しやすくするためです。
@@ -292,7 +437,7 @@ module.exports = {
 いずれもキーセレクタは`{}`内でカプセル化されます。他のキーセレクタが混ざり込むこともありません。
 
 ### 2. 入れ子にしてはいけない（メディアクエリ、上書き、本当に必要であると感じない限りは）
-オーサリングスタイルシートでセレクタは常に単一のものにします。これは、CSSのルールをできるだけフラットにするためです。（例えば`h1.yes-This_Selector`のように）キーセレクタに他のセレクタを追加する必要はありません。
+オーサリングスタイルシートでセレクタは常に単一のものにします。これは、CSSのルールを詳細度も含めてできるだけフラットにするためです。（例えば`h1.yes-This_Selector`のように）キーセレクタに他のセレクタを追加する必要はありません。
 
 - 望ましくない特異性（詳細度の上昇）を作り出す
 - より具体的なセレクタにする（詳細度を上げる）必要があるため、維持するのが難しくなります
@@ -300,7 +445,7 @@ module.exports = {
 - 要素タイプの場合、ルールを特定の要素や構造に結びつけます
 
 子要素をネストすることによって別のセレクタを生成することは禁止します。  
-キーセレクタ`.key-Selector`の中に`.key-Selector_Item`を生成してしまう。`.key-Selector_Item`に関する情報が重複する可能性がある。
+キーセレクタ`.key-Selector`の中に`.key-Selector_Item`を生成してしまい、`.key-Selector_Item`に関する情報が重複する可能性があります。
 
 ```css
 /* Good */
@@ -317,7 +462,7 @@ module.exports = {
 ```
 
 子要素をネストすることによって詳細度を上げることは禁止します。  
-キーセレクタ`.key-Selector`の中に`.key-Selector_Item`が存在することで、`.key-Selector_Item`に関する情報が重複する可能性があり、詳細度も上げてしまう。
+キーセレクタ`.key-Selector`の中に`.key-Selector_Item`が存在することで、`.key-Selector_Item`に関する情報が重複する可能性があり、詳細度も上げてしまいます。
 
 ```css
 /* Good */
@@ -334,14 +479,14 @@ module.exports = {
 ```
 
 ### 3. IDセレクタを使用しない（必要だと感じていても）
-ECSSではIDセレクタの使用を禁止します。
+ECSSではIDセレクタの使用を禁止しています。
 
 - クラスセレクタよりも具体的で上書きを難しくする
 - ページ内で一度しか使えない
 
 どうしてもIDを使わなければいけない場合は、属性セレクタを使ってクラスセレクタと同じ詳細度にします。
 
-```html
+```css
 [id="Thing"] {
   /* Property/Values Here */
 }
@@ -365,9 +510,10 @@ PostCSSのAutoprefixerによって必要なベンダープレフィックスを�
 ```
 
 ### 5. サイズや色、z-indexに変数を使用する
-サイズは通常何らかのパターンを持ちます。時間の節約になりますし、平準化を促すことができます。色に関しても同じことが言えます。
+ECSSは抽象化をなるべく避けますが、サイズ・色・z-indexは変数として管理することを推奨しています。
 
-z-indexも変数として定義しておきます。スタッキングコンテキストを完全にはカバーできませんが、いくらかは平準化できます。
+サイズと色を変数化することで微妙に異なる値に気づくことができるため、一貫性を保つことができます。
+z-indexに関してはスタッキングコンテキストを完全にカバーすることはできませんが、全体のバランスを見て数値を決めるのに役立ちます。
 
 ### 6. モバイルファーストで書く（max-widthを避ける）
 最小のビューポートを基準にすることで、スタイルの継承を促し、必要なときにだけ上書きをすることができます。
@@ -397,7 +543,7 @@ mixinを使った抽象化はなるべく避けてください。有用なケー
 - さまざまなブラウザに適した数の擬似セレクタ
 - 複雑なフォントスタック
 
-単純なフォントスタックは変数で定義します。それ以外の複雑なフォントスタックはmixinで定義すると手間を省けます。
+単純なフォントスタックは変数で定義します。それ以外の（例えば`font-family`以外のプロパティを持っている）複雑なフォントスタックはmixinで定義すると手間を省けます。
 
 プロジェクトのmixinは10個以下になるようにします。それより多い場合は不必要に抽象化されている可能性があります。
 
@@ -453,3 +599,4 @@ Minify時はextendのほうがmixinよりもファイルサイズは削減でき
 ## 参考リンク
 - [Enduring CSSの設計思想 - ECSSが目指す設計 | CodeGrid](https://app.codegrid.net/entry/2016-ecss-1)
 - [抽象化を避けるCSS設計方法論「Enduring CSS」 第1回 | HTML5Experts.jp](https://html5experts.jp/takazudo/21946/)
+- [PostCSSでECSSビルド環境構築 - PostCSSの基本的な使い方 | CodeGrid](https://app.codegrid.net/entry/2016-ecss-build-1)
