@@ -14,73 +14,73 @@ OOCSSが[DRY](https://www.google.co.jp/search?q=Don%27t+repeat+yourself&gws_rd=c
 ## ECSSで使用される用語の定義
 同じ言葉でも違った意味で解釈されてしまうことがあります。これを避けるためにECSSで使用される言葉とその意味を定義します。
 
-- コンテキスト：前後の文脈や状況
-- スコープ：有効になる範囲を限定すること
-- キーセレクタ：セレクタの右端にある実際にスタイルが適応されるセレクタ
-- 上書き（オーバーライド）：キーセレクタの値が継承に基づいて意図的に修正される状況
-- 接頭辞：クラス名の先頭につける識別子やベンダープレフィックス。 例：`tp-`, `-webkit-transform`
-- オーサリングスタイルシート：スタイリングルールを作成するファイル（PostCSSやSassなど）
-- CSS：ツールによって生成され、最終的にブラウザで解釈されるCSSファイル
+- コンテキスト：前後の文脈や状況。
+- スコープ：有効になる範囲。
+- キーセレクタ：セレクタのいちばん右側にある実際にスタイルが適応されるセレクタ。
+- 上書き（オーバーライド）：キーセレクタの値が継承に基づいて意図的に修正される状況。
+- 接頭辞：クラス名の先頭につける識別子やベンダープレフィックス。 例：`tp-`, `-webkit-`。
+- オーサリングスタイルシート：PostCSSやSassなどのスタイリングルールを作成するファイル。
+- CSS：ツールによって生成され、最終的にブラウザで解釈されるCSSファイル。
 
 ## ECSSが目標とすること
 ECSSは主に、CSSのシンタックスにあるブレース（`{}`）の外側をどのように扱うのかに主眼をおいています。そして、プロパティというブレースの内側のDRYではなく、キーセレクタこそが本当にDRYにすべきものだとしています。
 そのため、変数や最低限のmixinなどで共通化はするものの、ブレースの内側をDRYにすることには「見て見ぬ振りをすることが大切」だとも言っています。
 
-キーセレクタのDRYとは、コンテキストが違うものは既存のコンポーネントと似ていても別のコンポーネントとして考えること、既存のコンポーネントを抽象化したり拡張して表現しないということです。そして、キーセレクタは1つのブレースの中で完結している（DRYである）必要があります。
+### キーセレクタをDRYにする
+キーセレクタのDRYとは、コンテキストが違うコンポーネントは既存のコンポーネントと似ていても別のものとして考えること、既存のコンポーネントを（OOCSSのStrucrureやmixinなどで）抽象化したり拡張して表現しないということです。そして、キーセレクタは1つのブレースの中で完結している（DRYである）必要があります。
 
-抽象化したモジュールは変更に対する影響範囲が必然的に大きく、扱いづらくなってしまいます。多少冗長であっても、キーセレクタをDRYにすることによって変更しやすく削除しやすいモジュールにすることが、大規模なプロジェクトを長期間にわたって管理し続けるために大切なことだとしています。
+抽象化したモジュールは変更に対する影響範囲が必然的に大きく、扱いづらくなってしまいます。多少冗長であっても、キーセレクタをDRYにすることで、変更しやすく削除しやすいモジュールにすることが、大規模なプロジェクトを長期間にわたって管理し続けるために大切なことだとしています。
 
 ## モジュールと命名規則
 他のCSSの手法と同じく、ECSSも特定のスコープでUIを分割します。分割したUIをモジュールとよび、モジュールは以下の要素から構成されます。
 
-- namespace（名前空間）：名前の衝突を防ぐための接頭辞で、コンテキストやモジュールをあらわす
-- Module（モジュール）：視覚的に認識できる個別の機能領域のもっとも大きな区分
-- Component（コンポーネント）：Moduleに含まれる機能性を持つ部品
-- ChildNode（子ノード）：Componentを構成する独立した部品
-- variant（バリアント）：Module内の部品のバリエーション、もしくは部品が動的に変化した状態
+- namespace（名前空間）：クラス名の衝突を防ぐための接頭辞で、コンテキストやモジュールをあらわす。
+- Module（モジュール）：視覚的に認識できる個別の機能領域のもっとも大きな区分。
+- Component（コンポーネント）：Moduleに含まれる機能性を持つ部品。
+- ChildNode（子ノード）：Componentに含まれる独立した部品。
+- variant（バリアント）：Module内の部品のバリエーション、もしくは部品が動的に変化した状態。
 
-これはBEMの命名規則と似ています。
+### ECSSとBEM
+ECSSの命名規則はBEMの命名規則と似ています。
 
 - ModuleとComponentはBlock
 - ChildNodeはElement
 - variantはModifier
 
-BEMのBlockとECSSのModuleの違いは粒度の考え方です。BlockはModifierによってバリエーションを追加することができますが、Blockの上位にあるDOMにクラスが追加された場合はどう解釈すればいいでしょうか？ECSSでは上位のDOMをModule、内包される要素をComponentのように考えます。  
+BEMのBlockとECSSのModuleの違いは粒度の考え方です。  
+BlockはModifierによってバリエーションを追加することができますが、Blockの上位にあるDOMにクラスが追加された場合はどう解釈すればいいでしょうか？ECSSでは上位のDOMをModule、内包される要素をComponentのように考えます。  
 ECSSはBEMよりも粒度を大きくすることで、様々なケースに対応できるように考えられています。
 
-ECSSのModuleとComponentの考え方はAtomic DesignのOrganismsとMoleculesの考え方に似ています。
+### ECSSとAtomic Design
+ECSSのModuleとComponentの考え方はAtomic DesignのOrganismsとMoleculesの考え方にも似ています。
 
 - ModuleはOrganisms
 - ComponentはMolecules
 
+ただし、Atomic Designの場合は小さなものから組み合わせるという考え方ですが、ECSSの場合はいちばん大きなものを探して、その中にはどんな要素が必要なのかを考えていきます。
+
 ### 命名規則
 モジュールは以下のようなシンタックスで表現されます。
-
-```css
-namespace-ModuleOrComponent_ChildNode-variant
-```
-
-区切りを分かりやすくすると以下のようになります。
-
-```css
-.[namespace][-ModuleOrComponent][_ChildNode][-variant]
-```
-
-namespaceとvariantはローワーキャメルケースで、それ以外はアッパーキャメルケースになります。
-
-`-ModuleOrComponent`はModuleかComponentのいずれかになるので、実際には以下の2つのいずれかになります。
 
 ```css
 namespace-ModuleName_ChildNode-variant
 namespace-ComponentName_ChildNode-variant
 ```
 
+`namespace`はModule名になることもあります。
+
+```css
+modulename-ComponentName_ChildNode-variant
+```
+
+namespaceとvariantはローワーキャメルケースで、それ以外はアッパーキャメルケースになります。
+
 ECSSのComponentはModuleの中にある、一定以上の大きさや機能をもったUIのことを指します。例えば、以下のようなものが考えられます。
 
-- ヘッダーやフッターのような共通部分（SiteWide）のロゴやナビゲーション、検索フォーム（`.st-Logo`, `.st-Nav`, `.st-Search`）
-- トップページ内のaboutエリア、商品リスト、関連リンク（`.tp-About`, `.tp-ProductList`, `.tp-RelatedLink`）
-- `hero`名前空間に属したスタンダートなメインビジュアル（`.hero-Standard`）
-- `doc`名前空間に属したドキュメンテーションエリア（`.doc-Main`）
+- ヘッダーやフッターのような共通部分（Structure）のロゴやナビゲーション、検索フォーム（`.st-Logo`, `.st-Nav`, `.st-Search`）。
+- トップページ内のaboutエリア、商品リスト、関連リンク（`.tp-About`, `.tp-ProductList`, `.tp-RelatedLink`）。
+- `hero`名前空間に属したスタンダートなメインビジュアル（`.hero-Standard`）。
+- `doc`名前空間に属したドキュメンテーションエリア（`.doc-Main`）。
 
 クラス名だけでは、それがModuleなのかComponentなのか分からない場合もありますが、ECSSではそれも許容しています。必要なことはnamespaceでコンテキストごとに分割して、その中で重複しないことです。重複しないのであれば、細かな組み立て方は設計者に委ねられます。
 
@@ -94,7 +94,7 @@ CSSは最終的に1つのCSSファイルに結合されます。クラス名の�
 
 省略は必須ではないので、`.home-`のようにしてもいいでしょう。
 
-名前空間は`.hero-`や`.doc-`といったModuleをあらわすこともあります。例えば`hero`名前空間を持っているシンプルなModuleです。
+名前空間は`.hero-`や`.doc-`といったModuleをあらわすこともあります。例えば`hero`名前空間を持っているシンプルなModule（メインビジュアル）です。
 
 ```css
 /* `hero`名前空間を持つComponent */
@@ -103,7 +103,7 @@ CSSは最終的に1つのCSSファイルに結合されます。クラス名の�
 .hero-Strap {}
 ```
 
-上記のようにコンポーネントの粒度が大きすぎると感じる場合は、`.hero-Title`ではなく`.hero-Standard_Title`のようにChildNodeとしてスコープを作ると重複をより避けることができます。もしくは、`.tp-Hero`のようにトップページの`Hero`コンポーネントという意味合いを持たせてもいいでしょう。
+上記のような名前ではコンポーネントの粒度が大きすぎると感じるのであれば、`.hero-Title`ではなく`.hero-Standard_Title`のようにChildNodeとしてスコープを作ると重複をより避けることができます。もしくは、`.tp-Hero`のようにトップページの`Hero`コンポーネントという意味合いを持たせてもいいでしょう。
 
 ```css
 /* `hero`名前空間を持つComponent */
@@ -131,6 +131,7 @@ CSSは最終的に1つのCSSファイルに結合されます。クラス名の�
 
 - グローバルヘッダー → `.st-Header`
 - グローバルフッター → `.st-Footer`
+- サイト共通のグリッドレイアウト：`.st-Grid`, `.st-Grid_Item`
 
 #### モジュールのバージョン管理
 ECSSではModuleは（例えばトップページやカテゴリートップページのような）特定のコンテキストを持っています。コンテキストをスコープとしているので、Moduleは簡単に削除することができます。
@@ -138,13 +139,29 @@ ECSSではModuleは（例えばトップページやカテゴリートップペ�
 例えばトップページの改修があったとき、`.tp-`（TopPage）という名前空間を持ったModuleは迷わず削除することができます。改修後のModuleは同じ`.tp-`名前空間を使ってもいいですし、`.tp2-`（TopPage2）という名前空間に変更してもいいでしょう。
 
 ### サイト共通の汎用的なModule
-サイト内で使われる汎用的なModuleは「SiteWide」という意味の`.sw-`名前空間にが紹介されています。Atomic DesignのAtomsのように小さな部品のようなもので、例えばボタンやリスト、グリッドのようなモジュールです。
+サイト内で使われる汎用的なModuleは「SiteWide」という意味の`.sw-`名前空間が紹介されています。Atomic DesignのAtomsのように小さな部品のようなもので、例えばボタンやリストのようなモジュールです。
 
 - サイト共通のボタン：`.sw-Button`
 - サイト共通の順序つきリスト：`.sw-OrderedList`
-- サイト共通のグリッドレイアウト：`.sw-Grid`, `.sw-Grid_Item`
 
-ただし、ECSSでは汎用的なModuleは極力作るべきではないとされているため、メリットとデメリットをよく見定める必要があります。
+### layout名前空間
+トップページは1カラム、詳細ページは2カラムのように、ページによって大枠のレイアウトが大きく変わる場合があります。
+
+- サイトトップページ
+- カテゴリートップページ
+- カテゴリー詳細ページ
+- 採用情報ページ
+- 検索結果ページ
+- サイトマップページ
+
+このようなレイアウトを管理する`layout-`名前空間を作ってもいいでしょう。
+
+- サイトトップページ：`.layout-Home`
+- カテゴリートップページ：`.layout-Top`
+- カテゴリー詳細ページ：`.layout-Detail`
+
+### 汎用的なModuleのメリット・デメリット
+ECSSでは汎用的なModuleは極力作るべきではないとされているため、メリットとデメリットをよく見定める必要があります。
 
 汎用的なModuleを作るメリットは
 
@@ -157,7 +174,7 @@ ECSSではModuleは（例えばトップページやカテゴリートップペ�
 - 影響範囲が大きく変更・削除しにくい
 - 異なるnamespaceが混ざるので複雑になる（mixinなどで抽象化しても同じ）
 
-サイト共通の見た目であることと、実装として同じコードであることは違います。今は同じでも例外的なデザインになる可能性もあります。  
+サイト共通の見た目であることと、実装として同じコードであることは違います。今は同じでも、改修によって例外的なデザインになる可能性もあります。  
 例外を含んでいないか、サイト共通のコードとして実装してもいいのかを合意形成してから共通化する必要があります。  
 実装時には、以下のようなことについて注意するといいでしょう。
 
@@ -171,53 +188,52 @@ ECSSではModuleは（例えばトップページやカテゴリートップペ�
 ECSSではコンテキストをスコープとしてファイルを管理します。スコープごとに必要なものを分割することで、見つけやすく、削除しやすくします。  
 スコープごとにまとめられたフォルダをアセットと呼びます。
 
-例えば、以下のようなファイル構成が考えられます（WebサイトではHTMLファイルをアセットに含めるのは難しいので分けて管理をする想定です）。  
-要素セレクタや変数のようなベースになるCSSはglobalCSSディレクトリ以下にあり、それ以外のモジュールはnamespaceディレクトリ以下にあります。
+ECSSはWebアプリケーションを想定しているため、CSSとJSを並列に管理することを推奨していますが、このドキュメントではWebサイトを想定しているため以下のようなファイル構成を提案します。
 
 ```
-src
-├── globalCSS
-│   ├── base.css
-│   ├── tool.css
-│   └── variable.css
-├── namespace
-│   ├── CategoryTop
-│   │   ├── Module1
-│   │   │   ├── Module1.css
-│   │   │   ├── Module1.js
-│   │   │   └── img
-│   │   └── Module2
-│   │       ├── Module2.css
-│   │       ├── Module2.js
-│   │       └── img
-│   ├── SiteWide
-│   │   ├── Module1
-│   │   │   ├── Module1.css
-│   │   │   ├── Module1.js
-│   │   │   └── img
-│   │   └── Module2
-│   │       ├── Module2.css
-│   │       ├── Module2.js
-│   │       └── img
-│   ├── Structure
-│   │   ├── Module1
-│   │   │   ├── Module1.css
-│   │   │   ├── Module1.js
-│   │   │   └── img
-│   │   └── Module2
-│   │       ├── Module2.css
-│   │       ├── Module2.js
-│   │       └── img
-│   └── TopPage
-│       ├── Module1
-│       │   ├── Module1.css
-│       │   ├── Module1.js
-│       │   └── img
-│       └── Module2
-│           ├── Module2.css
-│           ├── Module2.js
-│           └── img
-└── style.css
+root or assets
+├── css
+│   ├── font/
+│   ├── base/
+│   │   ├── variable/
+│   │   ├── function/
+│   │   ├── mixin/
+│   │   ├── _normalize.scss
+│   │   ├── _base.scss
+│   │   └── _Icon.scss
+│   ├── SiteWide/
+│   │   ├── _Button.scss
+│   │   └── _Embed.scss
+│   ├── Structure/
+│   │   ├── _Grid.scss
+│   │   ├── _Footer.scss
+│   │   └── _ContentsFooter.scss
+│   ├── namespace/
+│   │   ├── layout/
+│   │   │   ├── _HomePage.scss
+│   │   │   ├── _Top.scss
+│   │   │   └── _Detail.scss
+│   │   ├── news/
+│   │   ├── product/
+│   │   ├── results/
+│   │   ├── search/
+│   │   └── sitemap/
+│   └── site.scss
+├── img/
+│   ├── common/
+│   │   ├── Header/
+│   │   ├── Footer/
+│   │   └── SideBanner
+│   └── products/
+└── js
+    ├── jquery-2.2.0.min.js
+    ├── common/
+    │   └── smooth-scroll.js
+    └── namespace/
+        ├── SiteWide/
+        ├── js/
+        │   └── smoothScroll.js
+        └── product/
 ```
 
 ディレクトリは以下のようなクラス名になります。
@@ -264,26 +280,32 @@ gulp.task("styles", ["lint-styles"], function () {
 });
 ```
 
-style.cssには以下のようにしてインポートします。namespaceディレクトリ内のModuleは依存関係を持たないようにします。
+CSSは以下のようにしてインポートします。namespaceディレクトリ内のModuleは依存関係を持たないようにする必要があります。
 
 ```scss
-@import "globalCSS/variable.css";
-@import "globalCSS/tool.css";
-@import "../../node_modules/normalize.css/normalize.css";
-@import "globalCSS/base.css";
-@import "namespace/**/*.css";
+@import "base/variable/**/*.scss";
+@import "base/function/**/*.scss";
+@import "base/mixin/**/*.scss";
+@import "base/_normalize.scss";
+@import "base/_base.scss";
+@import "base/_Icon.scss";
+
+@import "SiteWide/**/*.scss";
+@import "Structure/**/*.scss";
+@import "namespace/**/*.scss";
 ```
 
 ## Moduleの状態変化
 Moduleの状態変化は[WAI-ARIA](https://github.com/momdo/momdo.github.io/wiki#aria%E9%96%A2%E9%80%A3)を使うことが推奨されています。
 
-| 属性              | 意味                                      |
-|-----------------  |-----------------------------------------  |
-| `aria-checked`    | `true`で選択、`false`で非選択を示す      |
-| `aria-disabled`   | `true`で無効、`false`で通常を示す         |
-| `aria-busy`       | `true`で読込中、`false`で通常を示す      |
-| `aria-expanded`   | `true`で展開、`false`で格納を示す         |
-| `aria-hidden`     | `true`で非表示、`false`で表示状態を示す  |
+| 属性            | 意味                                                            |
+|---------------  |---------------------------------------------------------------- |
+| aria-selected   | trueで選択、falseで非選択を示す                                  |
+| aria-disabled   | trueで無効、falseで通常を示す                                   |
+| aria-hidden     | trueで非表示、falseで表示状態を示す                              |
+| aria-expanded   | trueで展開、falseで格納を示す                                   |
+| aria-busy       | trueで更新中、falseで通常を示す                                  |
+| aria-current    | 表示されているページを視覚的に表すリンクを示す（WAI-ARIA 1.1）   |
 
 `.is-active`のようなクラスを追加するよりも名前のバラつきが起こりにくいことや、標準化された支援技術によってアクセシブルになることが期待できます。
 
@@ -317,18 +339,29 @@ CMSでコンテンツを作成するときに、すべての要素にクラス�
 }
 ```
 
+クラス指定のない要素に限定するのもいいでしょう。
+
+```css
+.st-Main {
+  h1:not([class]) {}
+  p:not([class]) {}
+  ul:not([class]) {}
+  li:not([class]) {}
+}
+```
+
 ## ツール
 ECSSではCSSプリプロセッサとLintの使用を推奨しています。どのCSSプリプロセッサやタスクランナーを使うのかといったことは、プロジェクトの要件によっても違いますし、時期によっても最適なものは違います（ECSS本ではPostCSSとGulp、Stylelintを使用）。  
 必要な機能は以下の通りです。
 
-- 変数：サイズや色を取得したり、定数化することによるヒューマンエラーの軽減
-- mixins：フォントファミリーなどの特定の設定のマクロのようなもの
-- アンパサンド記号：（`&`）でキーセレクタを参照する
-- loop：長いルールセット（例えば、100種類の異なる色のヘッダー）のループを書く機能
-- partials：オーサリングスタイルシートを特定のスコープごとに分割
-- Lint：適切でないコードをデプロイするのを防ぐ
-- 積極的なMinify：コードの最適化
-- Autoprefixer：正確にベンダープレフィックスを付与し、オーサリングスタイルシートにベンダープレフィックスが存在しないようにする
+- 変数：サイズや色を取得したり、定数化することによるヒューマンエラーの軽減。
+- mixins：フォントファミリーなどの特定の設定のマクロのようなもの。
+- アンパサンド記号：（`&`）でキーセレクタを参照する。
+- loop：長いルールセット（例えば、100種類の異なる色のヘッダー）のループを書く機能。
+- partials：オーサリングスタイルシートを特定のスコープごとに分割。
+- Lint：適切でないコードをデプロイするのを防ぐ。
+- 積極的なMinify：コードの最適化。
+- Autoprefixer：正確にベンダープレフィックスを付与し、オーサリングスタイルシートにベンダープレフィックスが存在しないようにする。
 
 ### Stylelint
 PostCSSではStylelintを使います。`.stylelintrc`には以下のように設定します。
